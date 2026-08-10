@@ -11,7 +11,7 @@ namespace VRBuilder.Core.Properties
     /// Implements <see cref="IVector3"/> so its X, Y and Z components can be consumed wherever a three-dimensional vector is expected.
     /// </summary>
     [DataContract]
-    public struct Vector4Data : IVector3
+    public struct Vector4Data : IVector4
     {
         /// <summary>The X component of the vector.</summary>
         [DataMember]
