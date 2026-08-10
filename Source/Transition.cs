@@ -133,14 +133,14 @@ namespace VRBuilder.Core
 
             ///<inheritdoc />
             [System.Obsolete("Use TargetStepReference instead.")]
-            public IStep TargetStep
+            public IStep? TargetStep
             {
                 get => TargetStepReference.Entity;
                 set => TargetStepReference.Set(value);
             }
 
             ///<inheritdoc />
-            public IMode Mode { get; set; }
+            public IMode? Mode { get; set; }
 
             ///<inheritdoc />
             public bool IsCompleted { get; set; }

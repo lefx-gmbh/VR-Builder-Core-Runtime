@@ -38,7 +38,7 @@ namespace VRBuilder.Core
 
         /// <inheritdoc />
         [DataMember]
-        public TData Data { get; private set; }
+        public TData? Data { get; private set; }
 
         /// <inheritdoc />
         public virtual void RegenerateId()
