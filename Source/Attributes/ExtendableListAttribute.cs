@@ -3,6 +3,7 @@
 // Modifications copyright (c) 2021-2026 MindPort GmbH
 
 using System;
+using System.Collections;
 using System.Reflection;
 using System.Runtime.Serialization;
 using VRBuilder.Core.Utils;
@@ -10,7 +11,8 @@ using VRBuilder.Core.Utils;
 namespace VRBuilder.Core.Attributes
 {
     /// <summary>
-    /// Declares that new elements can be added to this list.
+    /// Marks an <see cref="IList"/> member as extendable. The editor renders an "add element" button at the
+    /// end of the list so the user can append new items of the declared element type.
     /// </summary>
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
     public class ExtendableListAttribute : MetadataAttribute

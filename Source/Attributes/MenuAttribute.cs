@@ -4,7 +4,8 @@ using System.Reflection;
 namespace VRBuilder.Core.Attributes
 {
     /// <summary>
-    /// Declares that "Menu" button has to be drawn.
+    /// Adds a menu button to the element's header offering actions such as remove, copy, paste, and move to
+    /// top.
     /// </summary>
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
     public class MenuAttribute : MetadataAttribute

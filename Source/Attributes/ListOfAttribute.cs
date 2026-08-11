@@ -11,7 +11,8 @@ using System.Runtime.Serialization;
 namespace VRBuilder.Core.Attributes
 {
     /// <summary>
-    /// Declares that children of this list have metadata attributes.
+    /// Marks an <see cref="IList{T}"/> member whose items each carry their own metadata attributes. Each item is
+    /// rendered as an independently metadata-wrapped element.
     /// </summary>
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
     public class ListOfAttribute : MetadataAttribute
@@ -26,18 +27,21 @@ namespace VRBuilder.Core.Attributes
             /// Reference to the child's attributes.
             /// </summary>
             [DataMember]
-            public List<MetadataAttribute> ChildAttributes { get; set; }
+            public List<MetadataAttribute>? ChildAttributes { get; set; }
 
             /// <summary>
             /// Reference to the child metadata.
             /// </summary>
             [DataMember]
-            public List<Dictionary<string, object>> ChildMetadata { get; set; }
+            public List<Dictionary<string, object>>? ChildMetadata { get; set; }
         }
 
         private readonly List<MetadataAttribute> childAttributes;
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Creates a <see cref="ListOfAttribute"/> that wraps each list item with the given child attributes.
+        /// </summary>
+        /// <param name="childAttributes">The metadata attributes applied to each list item.</param>
         public ListOfAttribute(params Type[] childAttributes)
         {
             Type[] uniqueTypes = childAttributes.Distinct().ToArray();
@@ -70,7 +74,8 @@ namespace VRBuilder.Core.Attributes
         /// </summary>
         public override bool IsMetadataValid(object metadata)
         {
-            Metadata listOfMetadata = (Metadata)metadata;
+            if (metadata is not Metadata listOfMetadata)
+                return false;
 
             if (AreSetsTheSame(childAttributes, listOfMetadata.ChildAttributes, attribute => attribute.Name) == false)
             {

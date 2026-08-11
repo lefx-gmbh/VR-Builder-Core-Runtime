@@ -15,13 +15,7 @@ namespace VRBuilder.Core.Attributes
         /// <summary>
         /// Name of attribute.
         /// </summary>
-        public string Name
-        {
-            get
-            {
-                return GetType().FullName;
-            }
-        }
+        public string Name => GetType().FullName;
 
         /// <summary>
         /// Return default metadata for <paramref name="owner"/>.

@@ -3,12 +3,14 @@
 // Modifications copyright (c) 2021-2026 MindPort GmbH
 
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 
 namespace VRBuilder.Core.Attributes
 {
     /// <summary>
-    /// Declares that "Delete" button has to be drawn.
+    /// Marks an <see cref="IList{T}"/> member so that when it renders empty, the editor inserts one default
+    /// instance of the declared element type. The list never stays empty.
     /// </summary>
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
     public class KeepPopulatedAttribute : MetadataAttribute
@@ -19,9 +21,9 @@ namespace VRBuilder.Core.Attributes
         private readonly Type defaultType;
 
         /// <summary>
-        /// Creates a new instance of <see cref="KeepPopulatedAttribute"/>.
+        /// Creates a <see cref="KeepPopulatedAttribute"/> for the given element type.
         /// </summary>
-        /// <param name="type">The type of the element to create.</param>
+        /// <param name="type">The type of the default element created when the list is empty.</param>
         public KeepPopulatedAttribute(Type type)
         {
             defaultType = type;

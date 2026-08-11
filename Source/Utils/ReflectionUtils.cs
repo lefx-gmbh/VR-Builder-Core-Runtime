@@ -103,7 +103,7 @@ namespace VRBuilder.Core.Utils
         {
             return GetAllTypes()
                 .Where(baseType.IsAssignableFrom)
-                .Where(type => type.IsClass && type.IsAbstract == false);
+                .Where(type => type is { IsClass: true, IsAbstract: false, IsGenericTypeDefinition: false });
         }
 
         /// <summary>

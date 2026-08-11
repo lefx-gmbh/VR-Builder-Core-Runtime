@@ -8,7 +8,8 @@ using System.Reflection;
 namespace VRBuilder.Core.Attributes
 {
     /// <summary>
-    /// Declares that "Delete" button has to be drawn.
+    /// Adds a delete button to the element's header. Pressing it sets the element's value to null, which
+    /// makes the host list remove that element.
     /// </summary>
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
     public class DeletableAttribute : MetadataAttribute

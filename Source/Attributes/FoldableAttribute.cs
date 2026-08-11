@@ -8,7 +8,7 @@ using System.Reflection;
 namespace VRBuilder.Core.Attributes
 {
     /// <summary>
-    /// Declares that this element's view has to be foldable.
+    /// Makes the element's body collapsible. A toggle in the header shows and hides the body content.
     /// </summary>
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
     public class FoldableAttribute : MetadataAttribute

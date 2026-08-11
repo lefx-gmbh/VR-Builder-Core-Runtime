@@ -8,7 +8,8 @@ using System.Reflection;
 namespace VRBuilder.Core.Attributes
 {
     /// <summary>
-    /// Declares that "Help" button has to be drawn.
+    /// Adds a help button to the element's header. The button opens the value type's help link when one is
+    /// defined with <see cref="HelpLinkAttribute"/>.
     /// </summary>
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
     public class HelpAttribute : MetadataAttribute

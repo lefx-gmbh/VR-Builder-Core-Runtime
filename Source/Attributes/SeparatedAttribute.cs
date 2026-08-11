@@ -8,7 +8,7 @@ using System.Reflection;
 namespace VRBuilder.Core.Attributes
 {
     /// <summary>
-    /// Declare that this element has to be separated with thin gray lines.
+    /// Draws thin separator lines above and below the element, visually setting it apart from its neighbors.
     /// </summary>
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
     public class SeparatedAttribute : MetadataAttribute
