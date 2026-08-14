@@ -209,8 +209,8 @@ namespace VRBuilder.Core.Utils
             Type[] referenceTypes = { typeof(SingleScenePropertyReference<>), typeof(MultipleScenePropertyReference<>) };
             (BindingFlags flags, Func<MemberInfo, Type> getMemberType)[] memberKinds =
             {
-                (BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, m => ((PropertyInfo)m).PropertyType),
-                (BindingFlags.Instance | BindingFlags.Public, m => ((FieldInfo)m).FieldType),
+                (BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, GetMemberType),
+                (BindingFlags.Instance | BindingFlags.Public, GetMemberType),
             };
 
             return referenceTypes
@@ -223,6 +223,8 @@ namespace VRBuilder.Core.Utils
                         .Cast<MemberInfo>()))
                 .ToList();
         }
+
+        private static Type GetMemberType(MemberInfo m) => m is PropertyInfo p ? p.PropertyType : ((FieldInfo)m).FieldType;
 
         /// <summary>
         /// Recursively resolves the transitive closure of <c>RequireComponent</c> dependencies for a given property type.
