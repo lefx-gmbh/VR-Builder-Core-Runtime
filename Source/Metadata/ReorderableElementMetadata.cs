@@ -49,5 +49,10 @@ namespace VRBuilder.Core.UI.Drawers.Metadata
         /// Determines, whether the entity is the last one in the list.
         /// </summary>
         public bool IsLast { get; set; }
+
+        /// <summary>
+        /// Current position of the item in the reorderable list.
+        /// </summary>
+        public int Index { get; set; }
     }
 }
