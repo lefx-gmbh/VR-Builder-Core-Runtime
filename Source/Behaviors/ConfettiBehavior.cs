@@ -114,6 +114,7 @@ namespace VRBuilder.Core.Behaviors
             /// </summary>
             [DataMember]
             [DisplayName("Confetti Machine Path")]
+            [UsesSpecificProcessDrawer("ConfettiMachinePathDrawer")]
             public string ConfettiMachinePrefabPath { get; set; }
 
             /// <summary>

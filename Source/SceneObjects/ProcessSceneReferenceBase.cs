@@ -173,7 +173,7 @@ namespace VRBuilder.Core.SceneObjects
         /// <param name="left">The first reference to compare.</param>
         /// <param name="right">The second reference to compare.</param>
         /// <returns><c>true</c> if <paramref name="left"/> and <paramref name="right"/> are not equal; otherwise, <c>false</c>.</returns>
-        public static bool operator !=(ProcessSceneReferenceBase left, ProcessSceneReferenceBase right)
+        public static bool operator !=(ProcessSceneReferenceBase? left, ProcessSceneReferenceBase? right)
         {
             if ((object)left == null)
             {
