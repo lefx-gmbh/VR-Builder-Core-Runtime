@@ -4,26 +4,6 @@ using System.Collections.Generic;
 namespace VRBuilder.Core.SceneObjects
 {
     /// <summary>
-    /// Event args for guid container events.
-    /// </summary>
-    public class GuidContainerEventArgs : EventArgs
-    {
-        /// <summary>
-        /// The guid that was added or removed.
-        /// </summary>
-        public readonly Guid Guid;
-
-        /// <summary>
-        /// Creates event args for the given guid.
-        /// </summary>
-        /// <param name="guid">The guid that was added or removed.</param>
-        public GuidContainerEventArgs(Guid guid)
-        {
-            Guid = guid;
-        }
-    }
-
-    /// <summary>
     /// A container for a list of guids that are associated to an object.
     /// </summary>
     public interface IGuidContainer
@@ -36,26 +16,31 @@ namespace VRBuilder.Core.SceneObjects
         /// <summary>
         /// Raised when a guid is added.
         /// </summary>
-        event EventHandler<GuidContainerEventArgs> GuidAdded;
+        event Action<object, IGuidContainerEventArgs> GuidAddedAction;
 
         /// <summary>
         /// Raised when a guid is removed.
         /// </summary>
-        event EventHandler<GuidContainerEventArgs> GuidRemoved;
+        event Action<object, IGuidContainerEventArgs> GuidRemovedAction;
 
         /// <summary>
         /// True if the object has the specified guid.
         /// </summary>
-        bool HasGuid(Guid guid);
+        bool HasGuid(Guid gd);
 
         /// <summary>
         /// Add the specified guid.
         /// </summary>        
-        void AddGuid(Guid guid);
+        void AddGuid(Guid gd);
 
         /// <summary>
         /// Remove the specified guid.
         /// </summary>
-        bool RemoveGuid(Guid guid);
+        bool RemoveGuid(Guid gd);
+    }
+
+    public interface IGuidContainerEventArgs
+    {
+        public Guid Guid { get; }
     }
 }

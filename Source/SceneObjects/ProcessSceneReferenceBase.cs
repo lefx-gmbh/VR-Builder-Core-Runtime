@@ -104,7 +104,7 @@ namespace VRBuilder.Core.SceneObjects
         /// Resets the guids on this reference to the specified value.
         /// </summary>
         /// <param name="newGuids">The guids to replace the current set with. If <c>null</c>, the reference is cleared.</param>
-        public void ResetGuids(IEnumerable<Guid> newGuids = null)
+        public void ResetGuids(IEnumerable<Guid>? newGuids = null)
         {
             if (newGuids == null)
             {
@@ -157,7 +157,7 @@ namespace VRBuilder.Core.SceneObjects
         /// <param name="left">The first reference to compare.</param>
         /// <param name="right">The second reference to compare.</param>
         /// <returns><c>true</c> if both references are <c>null</c>, or if <paramref name="left"/> equals <paramref name="right"/>; otherwise, <c>false</c>.</returns>
-        public static bool operator ==(ProcessSceneReferenceBase left, ProcessSceneReferenceBase right)
+        public static bool operator ==(ProcessSceneReferenceBase? left, ProcessSceneReferenceBase? right)
         {
             if ((object)left == null)
             {
