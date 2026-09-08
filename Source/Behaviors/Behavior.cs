@@ -21,7 +21,7 @@ namespace VRBuilder.Core.Behaviors
         /// </summary>
         protected Behavior()
         {
-            if (ServiceRegistry.Get<IRuntimeService>().LifeCycleLogging.LogBehaviors)
+            if (ServiceRegistry.Get<IRuntimeService>()?.LifeCycleLogging.LogBehaviors == true)
             {
                 LifeCycle.StageChanged += (sender, args) => { ForwardingLogger.LogFormat("{0}<b>Behavior</b> <i>'{1} ({2})'</i> is <b>{3}</b>.\n", ConsoleUtils.GetTabs(2), Data.Name, GetType().Name, LifeCycle.Stage); };
             }

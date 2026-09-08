@@ -32,7 +32,7 @@ namespace VRBuilder.Core
             Data.Conditions = new List<ICondition>();
             Data.TargetStepReference.Set(null);
 
-            if (ServiceRegistry.Get<IRuntimeService>().LifeCycleLogging.LogTransitions)
+            if (ServiceRegistry.Get<IRuntimeService>()?.LifeCycleLogging.LogTransitions == true)
             {
                 LifeCycle.StageChanged += (sender, args) =>
                 {

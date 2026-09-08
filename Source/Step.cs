@@ -50,7 +50,7 @@ namespace VRBuilder.Core
             Data.Behaviors = new BehaviorCollection();
             Data.Name = name;
 
-            if (ServiceRegistry.Get<IRuntimeService>().LifeCycleLogging.LogSteps)
+            if (ServiceRegistry.Get<IRuntimeService>()?.LifeCycleLogging.LogSteps == true)
             {
                 LifeCycle.StageChanged += (sender, args) => { ForwardingLogger.LogFormat("{0}<b>Step</b> <i>'{1}'</i> is <b>{2}</b>.\n", ConsoleUtils.GetTabs(), Data.Name, LifeCycle.Stage); };
             }

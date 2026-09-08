@@ -50,7 +50,7 @@ namespace VRBuilder.Core
                 Data.Steps.Add(firstStep);
             }
 
-            if (ServiceRegistry.Get<IRuntimeService>().LifeCycleLogging.LogChapters)
+            if (ServiceRegistry.Get<IRuntimeService>()?.LifeCycleLogging.LogChapters == true)
             {
                 LifeCycle.StageChanged += (sender, args) => { ForwardingLogger.LogFormat("<b>Chapter</b> <i>'{0}'</i> is <b>{1}</b>.\n", Data.Name, LifeCycle.Stage.ToString()); };
             }
