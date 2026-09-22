@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using VRBuilder.Core;
 
@@ -51,6 +52,8 @@ namespace VRBuilder.Core.Utils
 		/// Tries to extract a human-readable name from an entity by looking for entity.Data.Name (public instance).
 		/// Works for Process, Chapter, Step, Behaviors, etc. that follow the usual pattern.
 		/// </summary>
+		[UnconditionalSuppressMessage("Trimming", "IL2075",
+			Justification = "entity/data are live instances, so their runtime type's public 'Data'/'Name' properties cannot have been trimmed away.")]
 		private static string TryGetEntityName(IEntity entity)
 		{
 			if (entity == null)

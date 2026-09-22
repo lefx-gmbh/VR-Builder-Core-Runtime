@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using VRBuilder.Core.Conditions;
 using VRBuilder.Core.Properties;
@@ -156,12 +157,11 @@ namespace VRBuilder.Core.Utils
         /// satisfy <typeparamref name="T"/>.</returns>
         public static IEnumerable<Type> ExtractFittingPropertyType<T>(Type referenceType) where T : ISceneObjectProperty
         {
-            IEnumerable<Type> refs = ReflectionUtils.GetConcreteImplementationsOf(referenceType);
+            IEnumerable<Type> refs = TypeRegistry.GetConcreteImplementationsOf(referenceType);
             refs = refs.Where(typeof(T).IsAssignableFrom);
 
             if (!UnitTestChecker.IsUnitTesting)
             {
-                refs = refs.Where(type => type.Assembly.GetReferencedAssemblies().All(name => name.Name != "nunit.framework"));
                 refs = refs.Where(type => !ShouldExcludeType(type));
             }
 
@@ -203,6 +203,8 @@ namespace VRBuilder.Core.Utils
         /// before calling.
         /// </para>
         /// </remarks>
+        [UnconditionalSuppressMessage("Trimming", "IL2075",
+            Justification = "conditionType is the runtime type of a live conditionData instance, so its members cannot have been trimmed away.")]
         private static List<MemberInfo> GetAllPropertiesInGroupsFromCondition(IConditionData conditionData)
         {
             Type conditionType = conditionData.GetType();

@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
@@ -42,6 +43,10 @@ namespace VRBuilder.Core.Attributes
         /// Creates a <see cref="ListOfAttribute"/> that wraps each list item with the given child attributes.
         /// </summary>
         /// <param name="childAttributes">The metadata attributes applied to each list item.</param>
+        [UnconditionalSuppressMessage("Trimming", "IL2070",
+            Justification = "childAttributes are always typeof() literals at [ListOf(...)] usage sites, which already keeps those types; the parameterless-constructor check guards the actual Activator.CreateInstance call.")]
+        [UnconditionalSuppressMessage("Trimming", "IL2111",
+            Justification = "Same as above - the constructor call is on a typeof()-literal type with its public parameterless constructor already verified to exist.")]
         public ListOfAttribute(params Type[] childAttributes)
         {
             Type[] uniqueTypes = childAttributes.Distinct().ToArray();

@@ -5,6 +5,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using VRBuilder.Core.Attributes;
@@ -13,6 +14,12 @@ namespace VRBuilder.Core.Utils
 {
     /// <summary>
     /// Utility methods for reflection-based type discovery, instance creation and property/field access.
+    ///
+    /// The whole-assembly-scanning members here (<see cref="GetAllTypes"/> and everything built on it)
+    /// are not trim/NativeAOT-safe and are marked <see cref="RequiresUnreferencedCodeAttribute"/>
+    /// accordingly - they stay JIT-only (used by the Newtonsoft serialization project, which is not part
+    /// of the AOT-published core). Within core itself, prefer <see cref="TypeRegistry"/>, which is
+    /// populated by generated, AOT-safe compile-time discovery instead of runtime assembly scanning.
     /// </summary>
     public static class ReflectionUtils
     {
@@ -29,6 +36,8 @@ namespace VRBuilder.Core.Utils
         /// <summary>
         /// If the given <paramref name="list"/> implements IList{T}, return its generic type argument. Otherwise, return typeof(object).
         /// </summary>
+        [UnconditionalSuppressMessage("Trimming", "IL2075",
+            Justification = "list is a live instance, so its runtime type's interfaces cannot have been trimmed away.")]
         public static Type GetEntryType(object list)
         {
             Type entryDeclaredType = typeof(object);
@@ -48,6 +57,8 @@ namespace VRBuilder.Core.Utils
         /// <summary>
         /// If the given <paramref name="listType"/> is IList{T}, return its generic type argument. Otherwise, return typeof(object).
         /// </summary>
+        [UnconditionalSuppressMessage("Trimming", "IL2070",
+            Justification = "listType is always a type already live/reachable at the call site (a collection's own runtime type), so its interfaces cannot have been trimmed away.")]
         public static Type GetEntryType(Type listType)
         {
             Type entryDeclaredType = typeof(object);
@@ -76,6 +87,7 @@ namespace VRBuilder.Core.Utils
         /// <summary>
         /// Returns all existing types of all assemblies.
         /// </summary>
+        [RequiresUnreferencedCode("Scans every loaded assembly's types; not compatible with trimming or NativeAOT. Use TypeRegistry instead.")]
         public static IEnumerable<Type> GetAllTypes()
         {
             if (cachedTypes == null)
@@ -99,6 +111,7 @@ namespace VRBuilder.Core.Utils
         /// <summary>
         /// Returns non-abstract classes that implement or inherit from given type.
         /// </summary>
+        [RequiresUnreferencedCode("Calls GetAllTypes(); not compatible with trimming or NativeAOT. Use TypeRegistry.GetConcreteImplementationsOf instead.")]
         public static IEnumerable<Type> GetConcreteImplementationsOf(Type baseType)
         {
             return GetAllTypes()
@@ -113,6 +126,7 @@ namespace VRBuilder.Core.Utils
         /// <returns>
         /// <c>true</c> if the type's assembly does not reference UnityEditor or nunit.framework; otherwise, <c>false</c>.
         /// </returns>
+        [RequiresUnreferencedCode("Calls Assembly.GetReferencedAssemblies(); not compatible with trimming or NativeAOT.")]
         public static bool IsNonEditorType(this Type type)
         {
             return type.Assembly.GetReferencedAssemblies()
@@ -126,6 +140,7 @@ namespace VRBuilder.Core.Utils
         /// <param name="baseType">The base type to check against.</param>
         /// <param name="excludeEditor">If set to <c>true</c>, types from editor assemblies are excluded.</param>
         /// <returns>An enumerable of types assignable from <paramref name="baseType"/>.</returns>
+        [RequiresUnreferencedCode("Calls GetAllTypes(); not compatible with trimming or NativeAOT.")]
         public static IEnumerable<Type> GetConcreteTypesAssignableFrom(Type baseType, bool excludeEditor = true)
         {
             return GetAllTypes()
@@ -142,6 +157,7 @@ namespace VRBuilder.Core.Utils
         /// <returns>
         /// The concrete type that matches the DefaultImplementationAttribute; otherwise, <c>null</c> if none is found.
         /// </returns>
+        [RequiresUnreferencedCode("Calls GetConcreteTypesAssignableFrom(); not compatible with trimming or NativeAOT.")]
         public static Type GetImplementationWithDefaultAttribute(Type baseType, bool excludeEditor = true)
         {
             return GetConcreteTypesAssignableFrom(baseType, excludeEditor)
@@ -156,6 +172,7 @@ namespace VRBuilder.Core.Utils
         /// <returns>
         /// The concrete type without a DefaultImplementationAttribute; otherwise, <c>null</c> if none is found.
         /// </returns>
+        [RequiresUnreferencedCode("Calls GetConcreteTypesAssignableFrom(); not compatible with trimming or NativeAOT.")]
         public static Type GetImplementationWithoutDefaultAttribute(Type baseType, bool excludeEditor = true)
         {
             return GetConcreteTypesAssignableFrom(baseType, excludeEditor)
@@ -168,6 +185,7 @@ namespace VRBuilder.Core.Utils
         /// </summary>
         /// <param name="propertyType">The type of the property to compare against.</param>
         /// <returns>A list of types matching the criteria.</returns>
+        [RequiresUnreferencedCode("Calls GetAllTypes(); not compatible with trimming or NativeAOT.")]
         public static List<Type> GetFilteredPropertyTypes(Type propertyType)
         {
             return GetAllTypes()
@@ -183,6 +201,7 @@ namespace VRBuilder.Core.Utils
         /// </summary>
         /// <param name="extensionTypes">A collection of extension interface types to match against.</param>
         /// <returns>A list of available concrete extension types matching the criteria.</returns>
+        [RequiresUnreferencedCode("Calls GetAllTypes(); not compatible with trimming or NativeAOT.")]
         public static List<Type> GetFilteredAvailableExtensions(IEnumerable<Type> extensionTypes)
         {
             return GetAllTypes()
@@ -220,6 +239,7 @@ namespace VRBuilder.Core.Utils
         /// <summary>
         /// Returns non-abstract classes that implement or inherit from given type.
         /// </summary>
+        [RequiresUnreferencedCode("Calls GetConcreteImplementationsOf(); not compatible with trimming or NativeAOT. Use TypeRegistry.GetConcreteImplementationsOf instead.")]
         public static IEnumerable<Type> GetConcreteImplementationsOf<T>()
         {
             return GetConcreteImplementationsOf(typeof(T));
@@ -228,6 +248,8 @@ namespace VRBuilder.Core.Utils
         /// <summary>
         /// Creates instance of given type using public or protected constructor with no parameters.
         /// </summary>
+        [RequiresUnreferencedCode("Looks up a non-public constructor by reflection; not compatible with trimming.")]
+        [RequiresDynamicCode("Activator.CreateInstance on an arbitrary Type may require runtime code generation; not compatible with NativeAOT.")]
         public static object CreateInstanceOfType(Type type)
         {
             return Activator.CreateInstance(type, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, Array.Empty<object>(), null);
@@ -236,6 +258,8 @@ namespace VRBuilder.Core.Utils
         /// <summary>
         /// Creates instance of given type using public or protected constructor with no parameters.
         /// </summary>
+        [RequiresUnreferencedCode("Calls CreateInstanceOfType(Type); not compatible with trimming.")]
+        [RequiresDynamicCode("Calls CreateInstanceOfType(Type); not compatible with NativeAOT.")]
         public static T CreateInstanceOfType<T>()
         {
             return (T)CreateInstanceOfType(typeof(T));
@@ -244,6 +268,8 @@ namespace VRBuilder.Core.Utils
         /// <summary>
         /// Returns default instance of type.
         /// </summary>
+        [RequiresUnreferencedCode("Activator.CreateInstance on an arbitrary value type is not compatible with trimming.")]
+        [RequiresDynamicCode("Activator.CreateInstance on an arbitrary value type is not compatible with NativeAOT.")]
         public static object GetDefault(Type type)
         {
             if (type.IsValueType)
@@ -258,6 +284,8 @@ namespace VRBuilder.Core.Utils
         /// Returns generic IDictionary interface which is implemented by the type of <paramref name="dictionaryValue"/>.
         /// If <paramref name="dictionaryValue"/>'s type does not implement it, returns null.
         /// </summary>
+        [UnconditionalSuppressMessage("Trimming", "IL2075",
+            Justification = "dictionaryValue is a live instance, so its runtime type's interfaces cannot have been trimmed away.")]
         public static Type GetGenericDictionaryInterface(object dictionaryValue)
         {
             if (dictionaryValue == null)
@@ -274,6 +302,8 @@ namespace VRBuilder.Core.Utils
         /// <summary>
         /// Remove an element from <paramref name="list"/> at <paramref name="index"/>. If the list is fixed size, new instance is created.
         /// </summary>
+        [UnconditionalSuppressMessage("Trimming", "IL2072",
+            Justification = "list is a live instance, so its runtime type's constructor cannot have been trimmed away.")]
         public static void RemoveFromList(ref IList list, int index)
         {
             if (list.IsFixedSize)
@@ -299,6 +329,8 @@ namespace VRBuilder.Core.Utils
         /// <summary>
         /// Insert a <paramref name="value"/> in <paramref name="list"/> at index <paramref name="index"/>. If the list is fixed size, new instance is created.
         /// </summary>
+        [UnconditionalSuppressMessage("Trimming", "IL2072",
+            Justification = "list is a live instance, so its runtime type's constructor cannot have been trimmed away.")]
         public static void InsertIntoList(ref IList list, int index, object value)
         {
             if (list.IsFixedSize)
@@ -327,6 +359,8 @@ namespace VRBuilder.Core.Utils
         /// <summary>
         /// Replace <paramref name="list"/> with a <paramref name="newList"/>. New instance is created.
         /// </summary>
+        [UnconditionalSuppressMessage("Trimming", "IL2072",
+            Justification = "list is a live instance, so its runtime type's constructor cannot have been trimmed away.")]
         public static void ReplaceList<T>(ref IList list, IEnumerable<T> newList)
         {
             // Completely enumerate collection to know its size.
@@ -416,6 +450,7 @@ namespace VRBuilder.Core.Utils
         /// <summary>
         /// Returns the type from <paramref name="assemblyQualifiedName"/> or null if not found.
         /// </summary>
+        [RequiresUnreferencedCode("Calls GetAllTypes(); not compatible with trimming or NativeAOT.")]
         public static Type GetTypeFromAssemblyQualifiedName(string assemblyQualifiedName)
         {
             return string.IsNullOrEmpty(assemblyQualifiedName) ? null : GetAllTypes().FirstOrDefault(type => type.AssemblyQualifiedName == assemblyQualifiedName);
@@ -425,6 +460,7 @@ namespace VRBuilder.Core.Utils
         /// Return an IEnumerable of types which inherit <typeparamref name="T"/> and are not inherited by any other type.
         /// It is sorted by priority. <paramref name="lowestPriorityTypes"/> come at the end.
         /// </summary>
+        [RequiresUnreferencedCode("Calls GetConcreteImplementationsOf(); not compatible with trimming or NativeAOT.")]
         public static IEnumerable<Type> GetFinalImplementationsOf<T>(params Type[] lowestPriorityTypes)
         {
             IEnumerable<Type> types = GetConcreteImplementationsOf<T>()
@@ -441,6 +477,8 @@ namespace VRBuilder.Core.Utils
         /// <summary>
         /// Check if <paramref name="type"/> inherits from <paramref name="genericDefinition"/>.
         /// </summary>
+        [UnconditionalSuppressMessage("Trimming", "IL2070",
+            Justification = "typeToCheck is always a type already live/reachable at the call site (an entity's own runtime type), so its interfaces cannot have been trimmed away.")]
         public static bool IsSubclassOfGenericDefinition(this Type typeToCheck, Type genericDefinition)
         {
             if (genericDefinition.IsGenericTypeDefinition == false)
@@ -467,6 +505,8 @@ namespace VRBuilder.Core.Utils
         /// <summary>
         /// Determines if the given object is empty.
         /// </summary>
+        [UnconditionalSuppressMessage("Trimming", "IL2075",
+            Justification = "value is a live instance, so its runtime type's interfaces cannot have been trimmed away.")]
         public static bool IsEmpty(object value)
         {
             switch (value)
