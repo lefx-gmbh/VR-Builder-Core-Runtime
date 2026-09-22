@@ -4,6 +4,9 @@
 
 namespace VRBuilder.Core.EntityOwners
 {
+    /// <summary>
+    /// Data describing an entity sequence whose current entity is tracked.
+    /// </summary>
     public interface IEntitySequenceData<TEntity> : IEntityCollectionData<TEntity>, IEntitySequenceData where TEntity : IEntity
     {
         /// <summary>
@@ -12,6 +15,9 @@ namespace VRBuilder.Core.EntityOwners
         new TEntity Current { get; set; }
     }
 
+    /// <summary>
+    /// A non-generic view over an entity sequence's current entity.
+    /// </summary>
     public interface IEntitySequenceData : IData
     {
         /// <summary>

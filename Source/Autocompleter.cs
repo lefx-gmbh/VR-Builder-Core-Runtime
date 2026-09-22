@@ -10,14 +10,18 @@ namespace VRBuilder.Core
     public abstract class Autocompleter<TData> : IAutocompleter where TData : IData
     {
         /// <summary>
-        /// The entity's data.
+        /// Creates an autocompleter for the given data.
         /// </summary>
-        protected TData Data { get; }
-
+        /// <param name="data">The entity's data.</param>
         protected Autocompleter(TData data)
         {
             Data = data;
         }
+
+        /// <summary>
+        /// The entity's data.
+        /// </summary>
+        protected TData Data { get; }
 
         ///<inheritdoc />
         public abstract void Complete();

@@ -1,9 +1,8 @@
-using Newtonsoft.Json;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
-using UnityEngine.Scripting;
+using Newtonsoft.Json;
 using VRBuilder.Core.Attributes;
 using VRBuilder.Core.Configuration.Modes;
 using VRBuilder.Core.EntityOwners;
@@ -18,6 +17,67 @@ namespace VRBuilder.Core.Behaviors
     [HelpLink("https://mindport-gmbh.github.io/VR-Builder-Documentation/articles/core/behavior-sequence-behavior.html?utm_source=unity_editor&utm_medium=referral&utm_campaign=from_unity&utm_id=from_unity")]
     public class BehaviorSequence : Behavior<BehaviorSequence.EntityData>
     {
+        /// <summary>
+        /// Creates an empty behavior sequence, used by the JSON deserializer.
+        /// </summary>
+        [JsonConstructor]
+        public BehaviorSequence() : this(default(bool), new List<IBehavior>())
+        {
+        }
+
+        /// <summary>
+        /// Creates a blocking behavior sequence with the given <paramref name="behaviors"/>.
+        /// </summary>
+        /// <param name="playsOnRepeat">If <c>true</c>, the sequence loops continuously while the step is active.</param>
+        /// <param name="behaviors">Child behaviors activated and deactivated one after another.</param>
+        public BehaviorSequence(bool playsOnRepeat, IList<IBehavior> behaviors)
+        {
+            Data.PlaysOnRepeat = playsOnRepeat;
+            Data.Behaviors = new List<IBehavior>(behaviors);
+            Data.IsBlocking = true;
+        }
+
+        /// <summary>
+        /// Creates a behavior sequence with the given <paramref name="behaviors"/> and blocking behavior.
+        /// </summary>
+        /// <param name="playsOnRepeat">If <c>true</c>, the sequence loops continuously while the step is active.</param>
+        /// <param name="behaviors">Child behaviors activated and deactivated one after another.</param>
+        /// <param name="isBlocking">If <c>true</c>, the sequence prevents step completion while it is running.</param>
+        public BehaviorSequence(bool playsOnRepeat, IList<IBehavior> behaviors, bool isBlocking) : this(playsOnRepeat, behaviors)
+        {
+            Data.IsBlocking = isBlocking;
+        }
+
+        /// <inheritdoc />
+        public override IStageProcess GetActivatingProcess()
+        {
+            return new IteratingProcess(Data);
+        }
+
+        /// <inheritdoc />
+        public override IStageProcess GetActiveProcess()
+        {
+            return new ActiveProcess(Data);
+        }
+
+        /// <inheritdoc />
+        public override IStageProcess GetDeactivatingProcess()
+        {
+            return new StopEntityIteratingProcess<IBehavior>(Data);
+        }
+
+        /// <inheritdoc />
+        public override IStageProcess GetAbortingProcess()
+        {
+            return new ParallelAbortingProcess<EntityData>(Data);
+        }
+
+        /// <inheritdoc />
+        protected override IConfigurator GetConfigurator()
+        {
+            return new SequenceConfigurator<IBehavior>(Data);
+        }
+
         /// <summary>
         /// Behavior sequence's data.
         /// </summary>
@@ -39,16 +99,6 @@ namespace VRBuilder.Core.Behaviors
             [DisplayName("Child behaviors")]
             [Foldable, ReorderableListOf(typeof(FoldableAttribute), typeof(HelpAttribute), typeof(MenuAttribute)), ExtendableList]
             public List<IBehavior> Behaviors { get; set; }
-
-            /// <inheritdoc />
-            public override IEnumerable<IBehavior> GetChildren()
-            {
-                return Behaviors.ToList();
-            }
-
-            /// <inheritdoc />
-            [IgnoreDataMember]
-            public IBehavior Current { get; set; }
 
             /// <inheritdoc />
             [IgnoreDataMember]
@@ -79,10 +129,20 @@ namespace VRBuilder.Core.Behaviors
             }
 
             /// <inheritdoc />
+            public bool IsBlocking { get; set; }
+
+            /// <inheritdoc />
+            public override IEnumerable<IBehavior> GetChildren()
+            {
+                return Behaviors.ToList();
+            }
+
+            /// <inheritdoc />
             public IMode Mode { get; set; }
 
             /// <inheritdoc />
-            public bool IsBlocking { get; set; }
+            [IgnoreDataMember]
+            public IBehavior Current { get; set; }
 
             /// <inheritdoc />
             IEntity IEntitySequenceData.Current => Current;
@@ -90,8 +150,8 @@ namespace VRBuilder.Core.Behaviors
 
         private class IteratingProcess : EntityIteratingProcess<IEntitySequenceDataWithMode<IBehavior>, IBehavior>
         {
-            private IEntity[] children;
-            private int currentIndex;
+            private IEnumerator<IBehavior> enumerator;
+
 
             public IteratingProcess(IEntitySequenceDataWithMode<IBehavior> data) : base(data)
             {
@@ -101,8 +161,7 @@ namespace VRBuilder.Core.Behaviors
             public override void Start()
             {
                 base.Start();
-                children = RuntimeEntityGraph.GetChildren(Data);
-                currentIndex = 0;
+                enumerator = Data.GetChildren().GetEnumerator();
             }
 
             /// <inheritdoc />
@@ -120,14 +179,16 @@ namespace VRBuilder.Core.Behaviors
             /// <inheritdoc />
             protected override bool TryNext(out IBehavior entity)
             {
-                if (children == null || currentIndex >= children.Length)
+                if (enumerator == null || enumerator.MoveNext() == false)
                 {
                     entity = default(IBehavior);
                     return false;
                 }
-
-                entity = (IBehavior)children[currentIndex++];
-                return true;
+                else
+                {
+                    entity = enumerator.Current;
+                    return true;
+                }
             }
         }
 
@@ -185,53 +246,5 @@ namespace VRBuilder.Core.Behaviors
                 childProcess.End();
             }
         }
-
-        [JsonConstructor, Preserve]
-        public BehaviorSequence() : this(default(bool), new List<IBehavior>())
-        {
-        }
-
-        public BehaviorSequence(bool playsOnRepeat, IList<IBehavior> behaviors)
-        {
-            Data.PlaysOnRepeat = playsOnRepeat;
-            Data.Behaviors = new List<IBehavior>(behaviors);
-            Data.IsBlocking = true;
-        }
-
-        public BehaviorSequence(bool playsOnRepeat, IList<IBehavior> behaviors, bool isBlocking) : this(playsOnRepeat, behaviors)
-        {
-            Data.IsBlocking = isBlocking;
-        }
-
-        /// <inheritdoc />
-        public override IStageProcess GetActivatingProcess()
-        {
-            return new IteratingProcess(Data);
-        }
-
-        /// <inheritdoc />
-        public override IStageProcess GetActiveProcess()
-        {
-            return new ActiveProcess(Data);
-        }
-
-        /// <inheritdoc />
-        public override IStageProcess GetDeactivatingProcess()
-        {
-            return new StopEntityIteratingProcess<IBehavior>(Data);
-        }
-
-        /// <inheritdoc />
-        public override IStageProcess GetAbortingProcess()
-        {
-            return new ParallelAbortingProcess<EntityData>(Data);
-        }
-
-        /// <inheritdoc />
-        protected override IConfigurator GetConfigurator()
-        {
-            return new SequenceConfigurator<IBehavior>(Data);
-        }
-
     }
 }

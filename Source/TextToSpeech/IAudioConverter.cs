@@ -1,23 +1,26 @@
-﻿using UnityEngine;
+﻿// Modifications copyright (c) 2026 Aron Schaub
+// SPDX-License-Identifier: Apache-2.0
+
+using VRBuilder.Core.Primitives;
 
 namespace VRBuilder.TextToSpeech
 {
     /// <summary>
-    ///  Allows to convert audio into or out of AudioClips
+    ///  Allows converting audio into or out of AudioClips
     /// </summary>
     public interface IAudioConverter
     {       
         /// <summary>
-        /// This method uses NAudio to convert a mp3 file given as byte array to an AudioClip in .wav format.
+        /// This method uses NAudio to convert a mp3 file given as byte array to an AudioClip in .mp3 format.
         /// </summary>
         /// <param name="data">Data are the bytes of an mp3 file</param>
-        AudioClip CreateAudioClipFromMp3(byte[] data);
+        IAudioClip CreateAudioClipFromMp3(byte[] data);
 
         /// <summary>
         /// This method uses NAudio to convert a wave file given as byte array to an AudioClip in .wav format.
         /// </summary>
         /// <param name="data">Data are the bytes of a wave file</param>
-        AudioClip CreateAudioClipFromWAVE(byte[] data);
+        IAudioClip CreateAudioClipFromWAVE(byte[] data);
 
         /// <summary>
         /// This method uses NAudio to create .wav file from an AudioClip.
@@ -25,6 +28,6 @@ namespace VRBuilder.TextToSpeech
         /// <param name="filePath">Path with filename</param>
         /// <param name="audio">AudioClip to export</param>
         /// <returns>Returns if the AudioClip could wrote to an file on disk</returns>
-        bool TryWriteAudioClipToFile(AudioClip audio, string filePath);
+        bool TryWriteAudioClipToFile(IAudioClip audio, string filePath);
     }
 }

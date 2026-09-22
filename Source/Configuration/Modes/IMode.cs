@@ -1,8 +1,10 @@
 // Copyright (c) 2013-2019 Innoactive GmbH
 // Licensed under the Apache License, Version 2.0
 // Modifications copyright (c) 2021-2026 MindPort GmbH
+// Modifications copyright (c) 2026 Aron Schaub
+// SPDX-License-Identifier: Apache-2.0
 
-﻿using System;
+using System;
 
 namespace VRBuilder.Core.Configuration.Modes
 {
@@ -19,7 +21,7 @@ namespace VRBuilder.Core.Configuration.Modes
         /// <summary>
         /// Returns whether the given <see cref="IOptional"/> type should be skipped in this process mode.
         /// </summary>
-        /// <typeparam name="ISkippable">The actual type implementing ISkippable.</typeparam>
+        /// <typeparam name="TOptional">The actual type implementing TOptional.</typeparam>
         bool CheckIfSkipped<TOptional>() where TOptional : IOptional;
 
         /// <summary>

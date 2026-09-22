@@ -1,8 +1,10 @@
+// Modifications copyright (c) 2026 Aron Schaub
+// SPDX-License-Identifier: Apache-2.0
+
+using System.Diagnostics;
 using System.Runtime.Serialization;
-using VRBuilder.Core.Attributes;
-using UnityEngine;
 using Newtonsoft.Json;
-using UnityEngine.Scripting;
+using VRBuilder.Core.Attributes;
 
 namespace VRBuilder.Core.Conditions
 {
@@ -13,6 +15,29 @@ namespace VRBuilder.Core.Conditions
     [HelpLink("https://mindport-gmbh.github.io/VR-Builder-Documentation/articles/core/timeout-condition.html?utm_source=unity_editor&utm_medium=referral&utm_campaign=from_unity&utm_id=from_unity")]
     public class TimeoutCondition : Condition<TimeoutCondition.EntityData>
     {
+        /// <summary>
+        /// Creates an empty timeout condition, used by the JSON deserializer.
+        /// </summary>
+        [JsonConstructor]
+        public TimeoutCondition() : this(0)
+        {
+        }
+
+        /// <summary>
+        /// Creates a timeout condition that completes after <paramref name="timeout"/> seconds.
+        /// </summary>
+        /// <param name="timeout">Delay before the condition completes, in seconds.</param>
+        public TimeoutCondition(float timeout)
+        {
+            Data.Timeout = timeout;
+        }
+
+        /// <inheritdoc />
+        public override IStageProcess GetActiveProcess()
+        {
+            return new ActiveProcess(Data);
+        }
+
         /// <summary>
         /// The data for timeout condition.
         /// </summary>
@@ -27,7 +52,9 @@ namespace VRBuilder.Core.Conditions
             [DisplayTooltip("Delay before the condition completes, in seconds.")]
             public float Timeout { get; set; }
 
-            /// <inheritdoc />
+            /// <summary>
+            /// True if the configured timeout has elapsed.
+            /// </summary>
             public bool IsCompleted { get; set; }
 
             /// <inheritdoc />
@@ -35,10 +62,7 @@ namespace VRBuilder.Core.Conditions
             [HideInProcessInspector]
             public string Name
             {
-                get
-                {
-                    return $"Complete after {Timeout.ToString()} seconds";
-                }
+                get { return $"Complete after {Timeout} seconds"; }
             }
 
             /// <inheritdoc />
@@ -47,40 +71,30 @@ namespace VRBuilder.Core.Conditions
 
         private class ActiveProcess : BaseActiveProcessOverCompletable<EntityData>
         {
+            private readonly Stopwatch stopWatch = new();
+
             public ActiveProcess(EntityData data) : base(data)
             {
             }
 
-            private float timeStarted;
+            public override void Start()
+            {
+                base.Start();
+                stopWatch.Restart();
+            }
 
             /// <inheritdoc />
             protected override bool CheckIfCompleted()
             {
-                return Time.time - timeStarted >= Data.Timeout;
+                return stopWatch.ElapsedMilliseconds >= Data.Timeout;
             }
 
             /// <inheritdoc />
-            public override void Start()
+            public override void End()
             {
-                timeStarted = Time.time;
-                base.Start();
+                base.End();
+                stopWatch.Stop();
             }
-        }
-
-        [JsonConstructor, Preserve]
-        public TimeoutCondition() : this(0)
-        {
-        }
-
-        public TimeoutCondition(float timeout)
-        {
-            Data.Timeout = timeout;
-        }
-
-        /// <inheritdoc />
-        public override IStageProcess GetActiveProcess()
-        {
-            return new ActiveProcess(Data);
         }
     }
 }

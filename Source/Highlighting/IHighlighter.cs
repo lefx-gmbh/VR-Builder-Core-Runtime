@@ -1,5 +1,3 @@
-using UnityEngine;
-
 namespace VRBuilder.Core.Highlighting
 {
     /// <summary>
@@ -15,8 +13,8 @@ namespace VRBuilder.Core.Highlighting
         /// <summary>
         /// Starts highlighting this object.
         /// </summary>
-        /// <param name="highlightMaterial">Material to be applied as highlight.</param>
-        void StartHighlighting(Material highlightMaterial);
+        /// <param name="highlightId">Material ID to be applied as highlight.</param>
+        void StartHighlighting(string highlightId);
 
         /// <summary>
         /// Stops highlighting this object.
@@ -24,9 +22,9 @@ namespace VRBuilder.Core.Highlighting
         void StopHighlighting();
 
         /// <summary>
-        /// 
+        /// Returns the ID of the Highlight Material
         /// </summary>
-        /// <returns></returns>
-        Material GetHighlightMaterial();
+        /// <returns>string id</returns>
+        string GetHighlightMaterialId();
     }
 }

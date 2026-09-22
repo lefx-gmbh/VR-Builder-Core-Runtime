@@ -20,6 +20,12 @@ namespace VRBuilder.UI.Console
         /// </summary>
         public LogSeverity Severity { get; private set; }
 
+        /// <summary>
+        /// Creates a new log message with the given content and severity.
+        /// </summary>
+        /// <param name="message">The main message.</param>
+        /// <param name="details">Additional information provided with the message.</param>
+        /// <param name="severity">The severity of the message.</param>
         public LogMessage(string message, string details, LogSeverity severity)
         {
             Message = message;

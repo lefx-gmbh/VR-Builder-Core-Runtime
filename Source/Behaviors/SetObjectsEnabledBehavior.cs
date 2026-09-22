@@ -1,9 +1,11 @@
-using Newtonsoft.Json;
+// Modifications copyright (c) 2026 Aron Schaub
+// SPDX-License-Identifier: Apache-2.0
+
 using System;
 using System.Runtime.Serialization;
-using UnityEngine.Scripting;
+using Newtonsoft.Json;
 using VRBuilder.Core.Attributes;
-using VRBuilder.Core.Configuration;
+using VRBuilder.Core.Properties;
 using VRBuilder.Core.SceneObjects;
 
 namespace VRBuilder.Core.Behaviors
@@ -16,6 +18,47 @@ namespace VRBuilder.Core.Behaviors
     public class SetObjectsEnabledBehavior : Behavior<SetObjectsEnabledBehavior.EntityData>
     {
         /// <summary>
+        /// Creates a set-objects-enabled behavior with default values.
+        /// </summary>
+        [JsonConstructor]
+        public SetObjectsEnabledBehavior() : this(Guid.Empty, false)
+        {
+        }
+
+        /// <summary>
+        /// Creates a behavior that enables or disables the given objects.
+        /// </summary>
+        /// <param name="setEnabled">Whether the objects should be enabled (<c>true</c>) or disabled (<c>false</c>).</param>
+        public SetObjectsEnabledBehavior(bool setEnabled) : this(Guid.Empty, setEnabled, false)
+        {
+        }
+
+        /// <summary>
+        /// Creates a behavior that enables or disables the object with the given unique id.
+        /// </summary>
+        /// <param name="objectId">The unique id of the object to enable or disable.</param>
+        /// <param name="setEnabled">Whether the object should be enabled (<c>true</c>) or disabled (<c>false</c>).</param>
+        /// <param name="revertOnDeactivate">If <c>true</c>, the enabled state is reverted when the step is deactivated.</param>
+        public SetObjectsEnabledBehavior(Guid objectId, bool setEnabled, bool revertOnDeactivate = false)
+        {
+            Data.TargetObjects = new MultipleScenePropertyReference<IModifySceneObjectProperty>(objectId);
+            Data.SetEnabled = setEnabled;
+            Data.RevertOnDeactivation = revertOnDeactivate;
+        }
+
+        /// <inheritdoc />
+        public override IStageProcess GetActivatingProcess()
+        {
+            return new ActivatingProcess(Data);
+        }
+
+        /// <inheritdoc />
+        public override IStageProcess GetDeactivatingProcess()
+        {
+            return new DeactivatingProcess(Data);
+        }
+
+        /// <summary>
         /// Behavior data for <see cref="SetObjectsEnabledBehavior"/>.
         /// </summary>
         [DisplayName("Set Objects Enabled")]
@@ -27,15 +70,22 @@ namespace VRBuilder.Core.Behaviors
             /// </summary>
             [DataMember]
             [DisplayName("Objects")]
-            public MultipleSceneObjectReference TargetObjects { get; set; }
+            public MultipleScenePropertyReference<IModifySceneObjectProperty> TargetObjects { get; set; }
 
+            /// <summary>
+            /// Whether the objects should be set active (<c>true</c>) or inactive (<c>false</c>).
+            /// </summary>
             [DataMember]
             [HideInProcessInspector]
             public bool SetEnabled { get; set; }
 
+            /// <summary>
+            /// If <c>true</c>, the enabled state of the objects is reverted when the step is deactivated.
+            /// </summary>
             [DataMember]
             [DisplayName("Revert after step is complete")]
             public bool RevertOnDeactivation { get; set; }
+
             /// <inheritdoc />
             public Metadata Metadata { get; set; }
 
@@ -60,10 +110,8 @@ namespace VRBuilder.Core.Behaviors
             /// <inheritdoc />
             public override void Start()
             {
-                foreach (ISceneObject sceneObject in Data.TargetObjects.Values)
-                {
-                    RuntimeConfigurator.Configuration.SceneObjectManager.SetSceneObjectActive(sceneObject, Data.SetEnabled);
-                }
+                foreach (var property in Data.TargetObjects.Values)
+                    property.SetActive(Data.SetEnabled);
             }
         }
 
@@ -78,39 +126,10 @@ namespace VRBuilder.Core.Behaviors
             {
                 if (Data.RevertOnDeactivation)
                 {
-                    foreach (ISceneObject sceneObject in Data.TargetObjects.Values)
-                    {
-                        RuntimeConfigurator.Configuration.SceneObjectManager.SetSceneObjectActive(sceneObject, !Data.SetEnabled);
-                    }
+                    foreach (var property in Data.TargetObjects.Values)
+                        property.SetActive(!Data.SetEnabled);
                 }
             }
-        }
-
-        [JsonConstructor, Preserve]
-        public SetObjectsEnabledBehavior() : this(Guid.Empty, false)
-        {
-        }
-
-        public SetObjectsEnabledBehavior(bool setEnabled) : this(Guid.Empty, setEnabled, false)
-        {
-        }
-
-        public SetObjectsEnabledBehavior(Guid objectId, bool setEnabled, bool revertOnDeactivate = false)
-        {
-            Data.TargetObjects = new MultipleSceneObjectReference(objectId);
-            Data.SetEnabled = setEnabled;
-            Data.RevertOnDeactivation = revertOnDeactivate;
-        }
-
-        /// <inheritdoc />
-        public override IStageProcess GetActivatingProcess()
-        {
-            return new ActivatingProcess(Data);
-        }
-
-        public override IStageProcess GetDeactivatingProcess()
-        {
-            return new DeactivatingProcess(Data);
         }
     }
 }

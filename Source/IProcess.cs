@@ -5,7 +5,9 @@
 namespace VRBuilder.Core
 {
     /// <summary>
-    /// Interface of a process.
+    /// A process is the top-level container of a training: it owns an ordered collection of
+    /// <see cref="IChapter"/>s and, through its <see cref="ILifeCycle"/>, drives execution from
+    /// chapter to chapter. The running instance is driven by the <see cref="IProcessRunner"/> service.
     /// </summary>
     public interface IProcess : IEntity, IDataOwner<IProcessData>
     {

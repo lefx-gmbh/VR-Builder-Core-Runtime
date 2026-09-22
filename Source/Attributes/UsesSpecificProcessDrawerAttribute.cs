@@ -14,13 +14,17 @@ namespace VRBuilder.Core.Attributes
     public class UsesSpecificProcessDrawerAttribute : Attribute
     {
         /// <summary>
-        /// The drawer's type.
+        /// Creates a new instance of <see cref="UsesSpecificProcessDrawerAttribute"/>.
         /// </summary>
-        public string DrawerType { get; private set; }
-
+        /// <param name="drawerType">The type of the drawer to be used.</param>
         public UsesSpecificProcessDrawerAttribute(string drawerType)
         {
             DrawerType = drawerType;
         }
+
+        /// <summary>
+        /// The drawer's type.
+        /// </summary>
+        public string DrawerType { get; private set; }
     }
 }

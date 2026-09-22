@@ -18,6 +18,10 @@ namespace VRBuilder.Core.Attributes
         /// </summary>
         private readonly Type defaultType;
 
+        /// <summary>
+        /// Creates a new instance of <see cref="KeepPopulatedAttribute"/>.
+        /// </summary>
+        /// <param name="type">The type of the element to create.</param>
         public KeepPopulatedAttribute(Type type)
         {
             defaultType = type;

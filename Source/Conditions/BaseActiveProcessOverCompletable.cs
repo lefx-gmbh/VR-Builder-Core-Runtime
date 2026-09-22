@@ -11,6 +11,11 @@ namespace VRBuilder.Core.Conditions
     /// </summary>
     public abstract class BaseActiveProcessOverCompletable<TData> : StageProcess<TData> where TData : class, ICompletableData
     {
+        /// <summary>
+        /// Creates a process for the Active <see cref="Stage"/> of the given completable entity data.
+        /// </summary>
+        /// <param name="data">The completable entity's data.</param>
+        /// <param name="outer">The entity owning the data, or <c>null</c>.</param>
         protected BaseActiveProcessOverCompletable(TData data, IEntity outer = null) : base(data, outer)
         {
         }

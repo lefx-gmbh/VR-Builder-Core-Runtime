@@ -4,7 +4,7 @@
 
 using System;
 using System.Runtime.Serialization;
-using UnityEngine;
+using VRBuilder.Core.Primitives;
 
 namespace VRBuilder.Core
 {
@@ -15,6 +15,13 @@ namespace VRBuilder.Core
     public class ChapterMetadata : IMetadata
     {
         /// <summary>
+        /// Creates empty chapter metadata.
+        /// </summary>
+        public ChapterMetadata()
+        {
+        }
+
+        /// <summary>
         /// Reference to last selected <see cref="IStep"/>.
         /// </summary>
         [DataMember]
@@ -24,7 +31,7 @@ namespace VRBuilder.Core
         /// Reference to the entry node's position in the Workflow window.
         /// </summary>
         [DataMember]
-        public Vector2 EntryNodePosition { get; set; }
+        public IVector2 EntryNodePosition { get; set; }
 
         /// <summary>
         /// Unique identifier for chapter.
@@ -37,9 +44,5 @@ namespace VRBuilder.Core
         /// </summary>
         [DataMember]
         public ViewTransform ViewTransform { get; set; }
-
-        public ChapterMetadata()
-        {
-        }
     }
 }

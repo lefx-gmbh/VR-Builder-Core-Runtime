@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿// Modifications copyright (c) 2026 Aron Schaub
+// SPDX-License-Identifier: Apache-2.0
+
+using System.Collections.Generic;
 using VRBuilder.Core.TextToSpeech.Configuration;
 
 namespace VRBuilder.Core.TextToSpeech
@@ -9,7 +12,7 @@ namespace VRBuilder.Core.TextToSpeech
     public interface ITextToSpeechSpeaker
     {
         /// <summary>
-        /// Returns a list of all speakers that are set in the <see cref="ITextToSpeechConfiguration"/>
+        /// Returns a list of all speakers that are set in the <see cref="ITextToSpeechProviderConfiguration"/>
         /// </summary>
         /// <returns></returns>
         public List<string> GetSpeaker();

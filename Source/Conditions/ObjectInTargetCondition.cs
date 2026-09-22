@@ -1,5 +1,8 @@
+// Modifications copyright (c) 2026 Aron Schaub
+// SPDX-License-Identifier: Apache-2.0
+
 using System.Collections;
-using UnityEngine;
+using System.Diagnostics;
 
 namespace VRBuilder.Core.Conditions
 {
@@ -8,12 +11,17 @@ namespace VRBuilder.Core.Conditions
     /// </summary>
     public abstract class ObjectInTargetActiveProcess<TData> : StageProcess<TData> where TData : class, IObjectInTargetData
     {
+        private readonly Stopwatch stopWatch = new();
+
+        private bool isInside;
+
+        /// <summary>
+        /// Creates an "object in target" active process for the given condition data.
+        /// </summary>
+        /// <param name="data">The condition's data.</param>
         protected ObjectInTargetActiveProcess(TData data) : base(data)
         {
         }
-
-        private bool isInside;
-        private float timeStarted;
 
         /// <inheritdoc />
         public override void Start()
@@ -23,7 +31,7 @@ namespace VRBuilder.Core.Conditions
 
             if (isInside)
             {
-                timeStarted = Time.time;
+                stopWatch.Restart();
             }
         }
 
@@ -43,11 +51,11 @@ namespace VRBuilder.Core.Conditions
 
                     if (isInside)
                     {
-                        timeStarted = Time.time;
+                        stopWatch.Restart();
                     }
                 }
 
-                if (isInside && Time.time - timeStarted >= Data.RequiredTimeInside)
+                if (isInside && stopWatch.ElapsedMilliseconds >= Data.RequiredTimeInside)
                 {
                     Data.IsCompleted = true;
                     break;
@@ -60,6 +68,7 @@ namespace VRBuilder.Core.Conditions
         /// <inheritdoc />
         public override void End()
         {
+            stopWatch.Stop();
         }
 
         /// <inheritdoc />

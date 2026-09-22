@@ -1,6 +1,8 @@
 // Copyright (c) 2013-2019 Innoactive GmbH
 // Licensed under the Apache License, Version 2.0
 // Modifications copyright (c) 2021-2026 MindPort GmbH
+// Modifications copyright (c) 2026 Aron Schaub
+// SPDX-License-Identifier: Apache-2.0
 
 using System;
 
@@ -12,7 +14,29 @@ namespace VRBuilder.Core.Configuration.Modes
     /// </summary>
     public class ModeParameter<T>
     {
+        private readonly T defaultValue;
+
+        private readonly string key;
+
+        /// <summary>
+        /// Invoked whenever the configured parameter value changes, carrying the modified instance.
+        /// </summary>
         public EventHandler<EventArgs> ParameterModified;
+
+        private T value;
+
+        /// <summary>
+        /// Initializes a new <see cref="ModeParameter{T}"/> that reads its value from the given key of a <see cref="IModeService"/>.
+        /// The value starts at <paramref name="defaultValue"/> and is not considered modified until it changes.
+        /// </summary>
+        /// <param name="key">The key under which the <see cref="IModeService"/> stores the parameter value.</param>
+        /// <param name="defaultValue">The value used until the mode service provides a different one.</param>
+        public ModeParameter(string key, T defaultValue = default(T))
+        {
+            this.key = key;
+            this.defaultValue = defaultValue;
+            value = defaultValue;
+        }
 
         /// <summary>
         /// Is true when the current value is different to the default value.
@@ -24,10 +48,7 @@ namespace VRBuilder.Core.Configuration.Modes
         /// </summary>
         public T Value
         {
-            get
-            {
-                return value;
-            }
+            get { return value; }
             set
             {
                 if (this.value.Equals(value))
@@ -41,22 +62,10 @@ namespace VRBuilder.Core.Configuration.Modes
             }
         }
 
-        private readonly T defaultValue;
-
-        private T value;
-
-        private readonly string key;
-
-        public ModeParameter(string key, T defaultValue = default(T))
-        {
-            this.key = key;
-            this.defaultValue = defaultValue;
-            value = defaultValue;
-        }
-
         /// <summary>
         /// Configures this parameter with the given mode.
         /// </summary>
+        /// <param name="modeService">The mode service that provides the parameter value; must not be <c>null</c>.</param>
         public void Configure(IMode mode)
         {
             if (mode.ContainsParameter<T>(key))
@@ -74,7 +83,7 @@ namespace VRBuilder.Core.Configuration.Modes
         /// </summary>
         public void Reset()
         {
-            if (IsModified == false)
+            if (!IsModified)
             {
                 return;
             }
@@ -86,10 +95,7 @@ namespace VRBuilder.Core.Configuration.Modes
 
         private void EmitParameterModified()
         {
-            if (ParameterModified != null)
-            {
-                ParameterModified.Invoke(this, new EventArgs());
-            }
+            ParameterModified?.Invoke(this, EventArgs.Empty);
         }
     }
 }

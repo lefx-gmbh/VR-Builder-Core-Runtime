@@ -8,8 +8,15 @@ namespace VRBuilder.Core.SceneObjects
     /// </summary>
     public class GuidContainerEventArgs : EventArgs
     {
+        /// <summary>
+        /// The guid that was added or removed.
+        /// </summary>
         public readonly Guid Guid;
 
+        /// <summary>
+        /// Creates event args for the given guid.
+        /// </summary>
+        /// <param name="guid">The guid that was added or removed.</param>
         public GuidContainerEventArgs(Guid guid)
         {
             Guid = guid;
@@ -22,6 +29,11 @@ namespace VRBuilder.Core.SceneObjects
     public interface IGuidContainer
     {
         /// <summary>
+        /// All guids on the object.
+        /// </summary>
+        IEnumerable<Guid> Guids { get; }
+
+        /// <summary>
         /// Raised when a guid is added.
         /// </summary>
         event EventHandler<GuidContainerEventArgs> GuidAdded;
@@ -30,11 +42,6 @@ namespace VRBuilder.Core.SceneObjects
         /// Raised when a guid is removed.
         /// </summary>
         event EventHandler<GuidContainerEventArgs> GuidRemoved;
-
-        /// <summary>
-        /// All guids on the object.
-        /// </summary>
-        IEnumerable<Guid> Guids { get; }
 
         /// <summary>
         /// True if the object has the specified guid.

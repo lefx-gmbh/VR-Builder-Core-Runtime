@@ -5,9 +5,24 @@ namespace VRBuilder.Core.Setup
     /// </summary>
     public enum LayerSet
     {
+        /// <summary>
+        /// No layers are included.
+        /// </summary>
         None,
+
+        /// <summary>
+        /// Layers used for direct and ray interactions.
+        /// </summary>
         Interaction,
+
+        /// <summary>
+        /// Layers used for teleportation.
+        /// </summary>
         Teleportation,
+
+        /// <summary>
+        /// Layers used for UI interaction.
+        /// </summary>
         UI,
     }
 }

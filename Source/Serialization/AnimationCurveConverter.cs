@@ -2,59 +2,78 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Linq;
-using UnityEngine;
+using VRBuilder.Core.Primitives;
 
 namespace VRBuilder.Core.Serialization
 {
     /// <summary>
-    /// Converter that serializes and deserializes <see cref="AnimationCurve"/>.
+    /// Converter that serializes <see cref="IAnimationCurve"/> and deserializes <see cref="AnimationCurveData"/>.
     /// </summary>
     [NewtonsoftConverter]
     public class AnimationCurveConverter : JsonConverter
     {
-        /// <inheritdoc/>
-        public override bool CanConvert(Type objectType)
-        {
-            return typeof(AnimationCurve) == objectType;
-        }
-
         /// <inheritdoc/>
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             if (reader.TokenType == JsonToken.StartObject)
             {
                 try
-                {                    
-                    JObject data = JObject.Load(reader);
-                    JArray keys = data["Keys"].Value<JArray>();
-                    JsonReader keyReader = keys.CreateReader();
-                    Keyframe[] keyframes = serializer.Deserialize<Keyframe[]>(keyReader);
-                    AnimationCurve curve = new AnimationCurve(keyframes);
-                    curve.preWrapMode = (WrapMode)data["PreWrapMode"].Value<int>();
-                    curve.postWrapMode = (WrapMode)data["PostWrapMode"].Value<int>();
-
-                    return curve;
+                {
+                    var data = JObject.Load(reader);
+                    return new AnimationCurveData(
+                        ReadKeyFrames(data, serializer),
+                        data["PreWrapMode"]?.Value<int>() ?? 0,
+                        data["PostWrapMode"]?.Value<int>() ?? 0
+                    );
                 }
                 catch (Exception ex)
                 {
-                    Debug.LogErrorFormat("Exception occured while trying to parse an animation curve.\n{0}", ex.Message);
-                    return new AnimationCurve();
+                    ForwardingLogger.LogWarning(new JsonSerializationException($"Failed to deserialize {nameof(AnimationCurveData)} from JSON {SerializationLoggingHelper.FormatJsonLocation(ex)}.", ex));
                 }
             }
-            Debug.LogWarning("Can't read/parse animation curve from JSON.");
-            return new AnimationCurve();
+
+            return new AnimationCurveData();
+        }
+
+        private static KeyframeData[] ReadKeyFrames(JObject data, JsonSerializer serializer)
+        {
+            var keys = data["Keyframes"]?.Value<JArray>();
+
+            KeyframeData[] keyframes;
+            if (keys != null)
+                using (var keyReader = keys.CreateReader())
+                    keyframes = serializer.Deserialize<KeyframeData[]>(keyReader) ?? Array.Empty<KeyframeData>();
+            else
+                keyframes = Array.Empty<KeyframeData>();
+            return keyframes;
         }
 
         /// <inheritdoc/>
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            AnimationCurve curve = (AnimationCurve)value;
-            JObject data = new JObject();
+            switch (value)
+            {
+                case null:
+                    writer.WriteNull();
+                    return;
+                case AnimationCurveData data:
+                    new JObject
+                    {
+                        { "Keyframes", new JArray(data.Keyframes.Select(keyframe => JObject.FromObject(keyframe, serializer))) },
+                        { "PreWrapMode", data.PreWrapMode },
+                        { "PostWrapMode", data.PostWrapMode },
+                    }.WriteTo(writer);
+                    break;
+                default:
+                    ForwardingLogger.LogWarning(new JsonSerializationException($"Expected {nameof(AnimationCurveData)} but received {value.GetType().FullName}."));
+                    break;
+            }
+        }
 
-            data.Add("Keys", new JArray(curve.keys.Select(key => JObject.FromObject(key, serializer))));
-            data.Add("PreWrapMode", (int)curve.preWrapMode);
-            data.Add("PostWrapMode", (int)curve.postWrapMode);
-            data.WriteTo(writer);
+        /// <inheritdoc/>
+        public override bool CanConvert(Type objectType)
+        {
+            return typeof(IAnimationCurve).IsAssignableFrom(objectType);
         }
     }
 }

@@ -1,8 +1,12 @@
+// Modifications copyright (c) 2026 Aron Schaub
+// SPDX-License-Identifier: Apache-2.0
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using VRBuilder.Core.Configuration;
+using VRBuilder.Core.Runtime.Registry;
 
 namespace VRBuilder.Core.SceneObjects
 {
@@ -12,10 +16,33 @@ namespace VRBuilder.Core.SceneObjects
     [DataContract(IsReference = true)]
     public class MultipleSceneObjectReference : MultipleSceneReference<ISceneObject>
     {
+        /// <summary>
+        /// Initializes a new instance of <see cref="MultipleSceneObjectReference"/> referencing no objects.
+        /// </summary>
+        public MultipleSceneObjectReference() : base()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of <see cref="MultipleSceneObjectReference"/> referencing the object with the given guid.
+        /// </summary>
+        /// <param name="guid">The guid of the object this reference should point to.</param>
+        public MultipleSceneObjectReference(Guid guid) : base(guid)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of <see cref="MultipleSceneObjectReference"/> with the given set of guids.
+        /// </summary>
+        /// <param name="guids">The guids this reference should point to.</param>
+        public MultipleSceneObjectReference(IEnumerable<Guid> guids) : base(guids)
+        {
+        }
+
         /// <inheritdoc />
         protected override IEnumerable<ISceneObject> DetermineValue(IEnumerable<ISceneObject> cachedValue)
         {
-            if (RuntimeConfigurator.Exists == false || IsEmpty())
+            if (!ServiceRegistry.Has<IRuntimeService>() || IsEmpty())
             {
                 return new List<ISceneObject>();
             }
@@ -32,14 +59,10 @@ namespace VRBuilder.Core.SceneObjects
 
             foreach (Guid guid in Guids)
             {
-                value = value.Concat(RuntimeConfigurator.Configuration.SceneObjectRegistry.GetObjects(guid)).Distinct();
+                value = value.Concat(ServiceRegistry.Get<ISceneObjectRegistry>().GetObjects(guid)).Distinct();
             }
 
             return value;
         }
-
-        public MultipleSceneObjectReference() : base() { }
-        public MultipleSceneObjectReference(Guid guid) : base(guid) { }
-        public MultipleSceneObjectReference(IEnumerable<Guid> guids) : base(guids) { }
     }
 }

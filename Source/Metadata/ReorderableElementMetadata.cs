@@ -9,9 +9,24 @@ namespace VRBuilder.Core.UI.Drawers.Metadata
     /// </summary>
     public enum ReorderAction
     {
+        /// <summary>
+        /// No reorder should be performed.
+        /// </summary>
         None,
+
+        /// <summary>
+        /// Move the item to the top of the list.
+        /// </summary>
         MoveToTop,
+
+        /// <summary>
+        /// Move the item one position up.
+        /// </summary>
         MoveUp,
+
+        /// <summary>
+        /// Move the item one position down.
+        /// </summary>
         MoveDown
     }
 

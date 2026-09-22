@@ -2,10 +2,10 @@
 // Licensed under the Apache License, Version 2.0
 // Modifications copyright (c) 2021-2026 MindPort GmbH
 
-using UnityEngine;
 using System.Runtime.Serialization;
-using VRBuilder.Core.Utils.Logging;
-using VRBuilder.Unity;
+using VRBuilder.Core.Configuration;
+using VRBuilder.Core.Runtime.Registry;
+using VRBuilder.Utils;
 
 namespace VRBuilder.Core.Behaviors
 {
@@ -16,22 +16,21 @@ namespace VRBuilder.Core.Behaviors
     [DataContract(IsReference = true)]
     public abstract class Behavior<TData> : Entity<TData>, IBehavior where TData : class, IBehaviorData, new()
     {
+        /// <summary>
+        /// Creates a new behavior and subscribes to lifecycle logging when enabled in the runtime configuration.
+        /// </summary>
+        protected Behavior()
+        {
+            if (ServiceRegistry.Get<IRuntimeService>().LifeCycleLogging.LogBehaviors)
+            {
+                LifeCycle.StageChanged += (sender, args) => { ForwardingLogger.LogFormat("{0}<b>Behavior</b> <i>'{1} ({2})'</i> is <b>{3}</b>.\n", ConsoleUtils.GetTabs(2), Data.Name, GetType().Name, LifeCycle.Stage); };
+            }
+        }
+
         /// <inheritdoc />
         IBehaviorData IDataOwner<IBehaviorData>.Data
         {
             get { return Data; }
         }
-
-        protected Behavior()
-        {
-            if (LifeCycleLoggingConfig.Instance.LogBehaviors)
-            {
-                LifeCycle.StageChanged += (sender, args) =>
-                {
-                    Debug.LogFormat("{0}<b>Behavior</b> <i>'{1} ({2})'</i> is <b>{3}</b>.\n", ConsoleUtils.GetTabs(2), Data.Name, GetType().Name, LifeCycle.Stage);
-                };
-            }
-        }
-
     }
 }

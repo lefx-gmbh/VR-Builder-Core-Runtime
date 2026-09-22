@@ -9,10 +9,29 @@ namespace VRBuilder.Core
     /// </summary>
     public enum Stage
     {
+        /// <summary>
+        /// The entity is not running.
+        /// </summary>
         Inactive,
+
+        /// <summary>
+        /// The entity is starting up.
+        /// </summary>
         Activating,
+
+        /// <summary>
+        /// The entity is running.
+        /// </summary>
         Active,
+
+        /// <summary>
+        /// The entity is shutting down.
+        /// </summary>
         Deactivating,
+
+        /// <summary>
+        /// The entity is being aborted.
+        /// </summary>
         Aborting
     }
 }

@@ -1,6 +1,8 @@
 // Copyright (c) 2013-2019 Innoactive GmbH
 // Licensed under the Apache License, Version 2.0
 // Modifications copyright (c) 2021-2026 MindPort GmbH
+// Modifications copyright (c) 2026 Aron Schaub
+// SPDX-License-Identifier: Apache-2.0
 
 using System;
 using System.Linq;
@@ -15,10 +17,17 @@ namespace VRBuilder.Core
     /// offers member functions to trigger state changes.
     /// </summary>
     [DataContract(IsReference = true)]
-    public abstract class Entity<TData> : IEntity, IDataOwner<TData>, IRuntimeEntity where TData : class, IData, new()
+    public abstract class Entity<TData> : IEntity, IDataOwner<TData> where TData : class, IData, new()
     {
-        [IgnoreDataMember]
-        private IEntity[] runtimeChildren;
+        /// <summary>
+        /// Creates a new entity, assigns it a fresh identifier, and initializes its lifecycle and data.
+        /// </summary>
+        protected Entity()
+        {
+            Id = Guid.NewGuid();
+            LifeCycle = new LifeCycle(this);
+            Data = new TData();
+        }
 
         /// <inheritdoc />
         [DataMember]
@@ -27,27 +36,6 @@ namespace VRBuilder.Core
         /// <inheritdoc />
         [DataMember]
         public TData Data { get; private set; }
-
-        /// <inheritdoc />
-        IData IDataOwner.Data
-        {
-            get { return ((IDataOwner<TData>)this).Data; }
-        }
-
-        /// <inheritdoc />
-        [IgnoreDataMember]
-        public ILifeCycle LifeCycle { get; }
-
-        /// <inheritdoc />
-        [IgnoreDataMember]
-        public IEntity Parent { get; set; }
-
-        protected Entity()
-        {
-            Id = Guid.NewGuid();
-            LifeCycle = new LifeCycle(this);
-            Data = new TData();
-        }
 
         /// <inheritdoc />
         public virtual void RegenerateId()
@@ -62,6 +50,20 @@ namespace VRBuilder.Core
         {
             Id = id;
         }
+
+        /// <inheritdoc />
+        IData IDataOwner.Data
+        {
+            get { return ((IDataOwner<TData>)this).Data; }
+        }
+
+        /// <inheritdoc />
+        [IgnoreDataMember]
+        public ILifeCycle LifeCycle { get; }
+
+        /// <inheritdoc />
+        [IgnoreDataMember]
+        public IEntity Parent { get; set; }
 
         /// <inheritdoc />
         public virtual IStageProcess GetActivatingProcess()
@@ -87,36 +89,15 @@ namespace VRBuilder.Core
             return new EmptyProcess();
         }
 
-        /// <summary>
-        /// Override this method if your behavior or condition supports changing between process modes (<see cref="IMode"/>).
-        /// By default returns an empty configurator that does nothing.
-        /// </summary>
-        protected virtual IConfigurator GetConfigurator()
-        {
-            return new EmptyConfigurator();
-        }
-
         /// <inheritdoc />
         public virtual void Configure(IMode mode)
         {
             if (Data is IEntityCollectionData collectionData)
             {
-                if (runtimeChildren == null)
+                foreach (IEntity child in collectionData.GetChildren().Distinct())
                 {
-                    foreach (IEntity child in collectionData.GetChildren().Distinct())
-                    {
-                        child.Parent = this;
-                        child.Configure(mode);
-                    }
-                }
-                else
-                {
-                    for (int i = 0; i < runtimeChildren.Length; i++)
-                    {
-                        IEntity child = runtimeChildren[i];
-                        child.Parent = this;
-                        child.Configure(mode);
-                    }
+                    child.Parent = this;
+                    child.Configure(mode);
                 }
             }
 
@@ -141,59 +122,20 @@ namespace VRBuilder.Core
             }
             else if (Data is IEntityCollectionData collectionData)
             {
-                if (runtimeChildren == null)
+                foreach (IEntity child in collectionData.GetChildren().Distinct())
                 {
-                    foreach (IEntity child in collectionData.GetChildren().Distinct())
-                    {
-                        child.Update();
-                    }
-                }
-                else
-                {
-                    for (int i = 0; i < runtimeChildren.Length; i++)
-                    {
-                        runtimeChildren[i].Update();
-                    }
+                    child.Update();
                 }
             }
         }
 
-        bool IRuntimeEntity.IsRuntimeGraphPrepared => runtimeChildren != null;
-
-        IEntity[] IRuntimeEntity.RuntimeChildren => runtimeChildren ?? System.Array.Empty<IEntity>();
-
-        void IRuntimeEntity.PrepareRuntimeGraph()
+        /// <summary>
+        /// Override this method if your behavior or condition supports changing between process modes (<see cref="IMode"/>).
+        /// By default returns an empty configurator that does nothing.
+        /// </summary>
+        protected virtual IConfigurator GetConfigurator()
         {
-            if (runtimeChildren != null)
-            {
-                return;
-            }
-
-            if (Data is IEntityCollectionData collectionData)
-            {
-                IRuntimeEntityCollectionData runtimeData = Data as IRuntimeEntityCollectionData;
-                if (runtimeData != null && runtimeData.IsRuntimeGraphPrepared)
-                {
-                    runtimeChildren = runtimeData.RuntimeChildren.Distinct().ToArray();
-                }
-                else
-                {
-                    IEntity[] orderedChildren = RuntimeEntityGraph.Snapshot(collectionData);
-                    runtimeData?.SetRuntimeChildren(orderedChildren);
-                    // Execution preserves repeated entries; configuration and updates visit each entity once.
-                    runtimeChildren = orderedChildren.Distinct().ToArray();
-                }
-            }
-            else
-            {
-                runtimeChildren = System.Array.Empty<IEntity>();
-            }
-
-            for (int i = 0; i < runtimeChildren.Length; i++)
-            {
-                RuntimeEntityGraph.Prepare(runtimeChildren[i]);
-            }
+            return new EmptyConfigurator();
         }
-
     }
 }

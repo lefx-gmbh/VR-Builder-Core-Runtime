@@ -11,6 +11,14 @@ namespace VRBuilder.Core.EntityOwners
     /// </summary>
     public class StopEntityIteratingProcess<TEntity> : StageProcess<IEntitySequenceData<TEntity>> where TEntity : IEntity
     {
+        /// <summary>
+        /// Creates a process that stops the current entity of the given sequence data.
+        /// </summary>
+        /// <param name="data">The sequence data whose current entity should be deactivated.</param>
+        public StopEntityIteratingProcess(IEntitySequenceData<TEntity> data) : base(data)
+        {
+        }
+
         ///<inheritdoc />
         public override void Start()
         {
@@ -45,10 +53,6 @@ namespace VRBuilder.Core.EntityOwners
         public override void FastForward()
         {
             Data.Current?.LifeCycle.MarkToFastForward();
-        }
-
-        public StopEntityIteratingProcess(IEntitySequenceData<TEntity> data) : base(data)
-        {
         }
     }
 }

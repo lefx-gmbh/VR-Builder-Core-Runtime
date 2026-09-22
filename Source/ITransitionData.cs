@@ -10,7 +10,9 @@ using VRBuilder.Core.EntityOwners;
 
 namespace VRBuilder.Core
 {
-    // An interface for a transition's data.
+    /// <summary>
+    /// Data describing a <see cref="ITransition"/>: the conditions that trigger it and the step it leads to.
+    /// </summary>
     public interface ITransitionData : IEntityCollectionDataWithMode<ICondition>, ICompletableData, INamedData
     {
         /// <summary>

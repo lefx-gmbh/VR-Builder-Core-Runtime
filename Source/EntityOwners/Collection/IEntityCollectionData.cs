@@ -11,6 +11,9 @@ namespace VRBuilder.Core.EntityOwners
     /// </summary>
     public interface IEntityCollectionData<out TEntity> : IEntityCollectionData where TEntity : IEntity
     {
+        /// <summary>
+        /// Returns the children of this entity.
+        /// </summary>
         new IEnumerable<TEntity> GetChildren();
     }
 
@@ -22,6 +25,9 @@ namespace VRBuilder.Core.EntityOwners
     /// </summary>
     public interface IEntityCollectionData : IData
     {
+        /// <summary>
+        /// Returns the children of this entity as generic entities.
+        /// </summary>
         IEnumerable<IEntity> GetChildren();
     }
 }

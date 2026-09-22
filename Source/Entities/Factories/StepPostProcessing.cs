@@ -14,7 +14,7 @@ namespace VRBuilder.Core.Entities.Factories
         {
             if (entity.StepMetadata.StepType == "default")
             {
-                ITransition transition = EntityFactory.CreateTransition();
+                ITransition transition = Transition.Create();
                 entity.Data.Transitions.Data.Transitions.Add(transition);
             }
         }

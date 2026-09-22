@@ -1,32 +1,55 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 using VRBuilder.Core.Configuration;
+using VRBuilder.Core.Runtime.Registry;
 using VRBuilder.UI.Console;
 
 namespace VRBuilder.Core.Utils
 {
     /// <summary>
-    /// Log messages to an in-world console set up in the <see cref="RuntimeConfigurator"/>.
+    /// Log messages to an in-world console set up by the runtime configurator.
     /// </summary>
     public static class VRBConsole
     {
         private static ILogConsole console;
         private static Queue<Action> executionQueue = new Queue<Action>();
 
+        //TODO: make a VRBConsoleService or put it into RuntimeService
+        // public virtual string VRBConsolePrefab => "Prefabs/DefaultVRBConsole";
+        //
+        // protected ILogConsole logConsole;
+        //
+        // public ILogConsole VRBConsole
+        // {
+        //     get
+        //     {
+        //         if (logConsole == null)
+        //         {
+        //             GameObject logConsoleObj = GameObject.Instantiate(Resources.Load<GameObject>(VRBConsolePrefab));
+        //             logConsole = logConsoleObj.GetComponent<ILogConsole>();
+        //         }
+        //
+        //         if (logConsole == null)
+        //         {
+        //             throw new NullReferenceException("Failed to load world console prefab.");
+        //         }
+        //
+        //         return logConsole;
+        //     }
+        // }
         private static ILogConsole Console
         {
             get
             {
-                if (console == null && RuntimeConfigurator.Exists)
+                if (console == null && ServiceRegistry.Has<IRuntimeService>())
                 {
                     try
                     {
-                        console = RuntimeConfigurator.Configuration.VRBConsole;
+                        // console = RuntimeConfigurator.Configuration.VRBConsole;
                     }
                     catch (Exception ex)
                     {
-                        Debug.LogWarning($"Could not initialize VR console: {ex.Message}");
+                        ForwardingLogger.LogWarning($"Could not initialize VR console: {ex.Message}");
                     }
                 }
 

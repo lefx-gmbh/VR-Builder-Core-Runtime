@@ -5,12 +5,13 @@
 using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using UnityEngine;
+using VRBuilder.Core.Primitives;
+using VRBuilder.Core.Properties;
 
 namespace VRBuilder.Core.Serialization
 {
     /// <summary>
-    /// Converts Vector3 into json and back.
+    /// Converts IVector3 into json and back as Vector3Data.
     /// </summary>
     [NewtonsoftConverter]
     internal class Vector3Converter : JsonConverter
@@ -18,14 +19,25 @@ namespace VRBuilder.Core.Serialization
         /// <inheritDoc/>
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            Vector3 vec = (Vector3) value;
-            JObject data = new JObject();
-
-            data.Add("x", vec.x);
-            data.Add("y", vec.y);
-            data.Add("z", vec.z);
-
-            data.WriteTo(writer);
+            switch (value)
+            {
+                case null:
+                    writer.WriteNull();
+                    return;
+                case IVector3 vec:
+                {
+                    new JObject
+                    {
+                        { "x", vec.X },
+                        { "y", vec.Y },
+                        { "z", vec.Z }
+                    }.WriteTo(writer);
+                    break;
+                }
+                default:
+                    ForwardingLogger.LogWarning(new JsonSerializationException($"Expected {nameof(IVector3)} but received {value.GetType().FullName}."));
+                    break;
+            }
         }
 
         /// <inheritDoc/>
@@ -33,17 +45,29 @@ namespace VRBuilder.Core.Serialization
         {
             if (reader.TokenType == JsonToken.StartObject)
             {
-                JObject data = (JObject)JToken.ReadFrom(reader);
-                return new Vector3(data["x"].Value<float>(), data["y"].Value<float>(), data["z"].Value<float>());
+                try
+                {
+                    var data = JObject.Load(reader);
+
+                    var x = data["x"]?.Value<float>() ?? 0;
+                    var y = data["y"]?.Value<float>() ?? 0;
+                    var z = data["z"]?.Value<float>() ?? 0;
+
+                    return new Vector3Data(x, y, z);
+                }
+                catch (Exception ex)
+                {
+                    ForwardingLogger.LogWarning(new JsonSerializationException($"Failed to deserialize {nameof(Vector3Data)} from JSON {SerializationLoggingHelper.FormatJsonLocation(ex)}.", ex));
+                }
             }
 
-            return Vector3.zero;
+            return new Vector3Data(0, 0, 0);
         }
 
         /// <inheritDoc/>
         public override bool CanConvert(Type objectType)
         {
-            return typeof(Vector3) == objectType;
+            return typeof(IVector3).IsAssignableFrom(objectType);
         }
     }
 }

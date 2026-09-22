@@ -8,6 +8,16 @@ namespace VRBuilder.Core.UI.SelectableValues
     /// </summary>
     public class VideoClipOrURLSelectableValue : SelectableValue<string, string>
     {
+        /// <summary>
+        /// Initializes a new instance of <see cref="VideoClipOrURLSelectableValue"/> with the video clip resource selected and no value set.
+        /// </summary>
+        public VideoClipOrURLSelectableValue()
+        {
+            IsFirstValueSelected = true;
+            FirstValue = string.Empty;
+            SecondValue = string.Empty;
+        }
+
         /// <inheritdoc/>
         public override string FirstValueLabel => "Video clip resource";
 
@@ -18,12 +28,5 @@ namespace VRBuilder.Core.UI.SelectableValues
         [DataMember]
         [UsesSpecificProcessDrawer("VideoClipResourceDrawer")]
         public override string FirstValue { get; set; }
-
-        public VideoClipOrURLSelectableValue()
-        {
-            IsFirstValueSelected = true;
-            FirstValue = string.Empty;
-            SecondValue = string.Empty;
-        }
     }
 }

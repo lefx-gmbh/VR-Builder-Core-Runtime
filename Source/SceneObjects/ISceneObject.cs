@@ -1,10 +1,10 @@
 // Copyright (c) 2013-2019 Innoactive GmbH
-// Licensed under the Apache License, Version 2.0
 // Modifications copyright (c) 2021-2026 MindPort GmbH
+// Modifications copyright (c) 2026 Aron Schaub
+// SPDX-License-Identifier: Apache-2.0
 
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 using VRBuilder.Core.Properties;
 
 namespace VRBuilder.Core.SceneObjects
@@ -14,9 +14,21 @@ namespace VRBuilder.Core.SceneObjects
     /// </summary>
     public class UniqueIdChangedEventArgs : EventArgs
     {
+        /// <summary>
+        /// The new unique id.
+        /// </summary>
         public readonly Guid NewId;
+
+        /// <summary>
+        /// The previous unique id.
+        /// </summary>
         public readonly Guid PreviousId;
 
+        /// <summary>
+        /// Creates event args for a unique id change.
+        /// </summary>
+        /// <param name="previousId">The previous unique id.</param>
+        /// <param name="newId">The new unique id.</param>
         public UniqueIdChangedEventArgs(Guid previousId, Guid newId)
         {
             NewId = newId;
@@ -30,24 +42,19 @@ namespace VRBuilder.Core.SceneObjects
     public interface ISceneObject : ILockable, IGuidContainer
     {
         /// <summary>
-        /// Called when the object's object id has been changed.
-        /// </summary>
-        event EventHandler<UniqueIdChangedEventArgs> ObjectIdChanged;
-
-        /// <summary>
         /// Unique Guid for each entity, which is required
         /// </summary>
         Guid Guid { get; }
 
         /// <summary>
-        /// Target GameObject, used for applying stuff.
-        /// </summary>
-        GameObject GameObject { get; }
-
-        /// <summary>
         /// Properties on the scene object.
         /// </summary>
         ICollection<ISceneObjectProperty> Properties { get; }
+
+        /// <summary>
+        /// Called when the object's object id has been changed.
+        /// </summary>
+        event EventHandler<UniqueIdChangedEventArgs> ObjectIdChanged;
 
         /// <summary>
         /// True if the scene object has a property of the specified type.

@@ -1,0 +1,15 @@
+C:\Projects\VR-Builder-MCP\VR-Builder-Core-Runtime\VRBuilder.Core.Serialization.Newtonsoft\bin\Debug\net10.0\VRBuilder.Core.Serialization.Newtonsoft.deps.json
+C:\Projects\VR-Builder-MCP\VR-Builder-Core-Runtime\VRBuilder.Core.Serialization.Newtonsoft\bin\Debug\net10.0\VRBuilder.Core.Serialization.Newtonsoft.dll
+C:\Projects\VR-Builder-MCP\VR-Builder-Core-Runtime\VRBuilder.Core.Serialization.Newtonsoft\bin\Debug\net10.0\VRBuilder.Core.Serialization.Newtonsoft.pdb
+C:\Projects\VR-Builder-MCP\VR-Builder-Core-Runtime\VRBuilder.Core.Serialization.Newtonsoft\bin\Debug\net10.0\VRBuilder.Core.dll
+C:\Projects\VR-Builder-MCP\VR-Builder-Core-Runtime\VRBuilder.Core.Serialization.Newtonsoft\bin\Debug\net10.0\VRBuilder.Core.pdb
+C:\Projects\VR-Builder-MCP\VR-Builder-Core-Runtime\VRBuilder.Core.Serialization.Newtonsoft\obj\Debug\net10.0\VRBuilder.Core.Serialization.Newtonsoft.csproj.AssemblyReference.cache
+C:\Projects\VR-Builder-MCP\VR-Builder-Core-Runtime\VRBuilder.Core.Serialization.Newtonsoft\obj\Debug\net10.0\VRBuilder.Core.Serialization.Newtonsoft.GeneratedMSBuildEditorConfig.editorconfig
+C:\Projects\VR-Builder-MCP\VR-Builder-Core-Runtime\VRBuilder.Core.Serialization.Newtonsoft\obj\Debug\net10.0\VRBuilder.Core.Serialization.Newtonsoft.AssemblyInfoInputs.cache
+C:\Projects\VR-Builder-MCP\VR-Builder-Core-Runtime\VRBuilder.Core.Serialization.Newtonsoft\obj\Debug\net10.0\VRBuilder.Core.Serialization.Newtonsoft.AssemblyInfo.cs
+C:\Projects\VR-Builder-MCP\VR-Builder-Core-Runtime\VRBuilder.Core.Serialization.Newtonsoft\obj\Debug\net10.0\VRBuilder.Core.Serialization.Newtonsoft.csproj.CoreCompileInputs.cache
+C:\Projects\VR-Builder-MCP\VR-Builder-Core-Runtime\VRBuilder.Core.Serialization.Newtonsoft\obj\Debug\net10.0\VRBuilde.769B85D1.Up2Date
+C:\Projects\VR-Builder-MCP\VR-Builder-Core-Runtime\VRBuilder.Core.Serialization.Newtonsoft\obj\Debug\net10.0\VRBuilder.Core.Serialization.Newtonsoft.dll
+C:\Projects\VR-Builder-MCP\VR-Builder-Core-Runtime\VRBuilder.Core.Serialization.Newtonsoft\obj\Debug\net10.0\refint\VRBuilder.Core.Serialization.Newtonsoft.dll
+C:\Projects\VR-Builder-MCP\VR-Builder-Core-Runtime\VRBuilder.Core.Serialization.Newtonsoft\obj\Debug\net10.0\VRBuilder.Core.Serialization.Newtonsoft.pdb
+C:\Projects\VR-Builder-MCP\VR-Builder-Core-Runtime\VRBuilder.Core.Serialization.Newtonsoft\obj\Debug\net10.0\ref\VRBuilder.Core.Serialization.Newtonsoft.dll

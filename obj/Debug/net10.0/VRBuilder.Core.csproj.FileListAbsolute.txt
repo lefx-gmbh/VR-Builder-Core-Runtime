@@ -1,0 +1,12 @@
+C:\Projects\VR-Builder-MCP\VR-Builder-Core-Runtime\bin\Debug\net10.0\VRBuilder.Core.deps.json
+C:\Projects\VR-Builder-MCP\VR-Builder-Core-Runtime\bin\Debug\net10.0\VRBuilder.Core.dll
+C:\Projects\VR-Builder-MCP\VR-Builder-Core-Runtime\bin\Debug\net10.0\VRBuilder.Core.pdb
+C:\Projects\VR-Builder-MCP\VR-Builder-Core-Runtime\obj\Debug\net10.0\VRBuilder.Core.GeneratedMSBuildEditorConfig.editorconfig
+C:\Projects\VR-Builder-MCP\VR-Builder-Core-Runtime\obj\Debug\net10.0\VRBuilder.Core.AssemblyInfoInputs.cache
+C:\Projects\VR-Builder-MCP\VR-Builder-Core-Runtime\obj\Debug\net10.0\VRBuilder.Core.AssemblyInfo.cs
+C:\Projects\VR-Builder-MCP\VR-Builder-Core-Runtime\obj\Debug\net10.0\VRBuilder.Core.csproj.CoreCompileInputs.cache
+C:\Projects\VR-Builder-MCP\VR-Builder-Core-Runtime\obj\Debug\net10.0\VRBuilder.Core.dll
+C:\Projects\VR-Builder-MCP\VR-Builder-Core-Runtime\obj\Debug\net10.0\refint\VRBuilder.Core.dll
+C:\Projects\VR-Builder-MCP\VR-Builder-Core-Runtime\obj\Debug\net10.0\VRBuilder.Core.pdb
+C:\Projects\VR-Builder-MCP\VR-Builder-Core-Runtime\obj\Debug\net10.0\ref\VRBuilder.Core.dll
+C:\Projects\VR-Builder-MCP\VR-Builder-Core-Runtime\obj\Debug\net10.0\VRBuilder.Core.sourcelink.json

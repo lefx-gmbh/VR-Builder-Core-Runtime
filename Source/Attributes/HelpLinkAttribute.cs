@@ -13,13 +13,17 @@ namespace VRBuilder.Core.Attributes
     public class HelpLinkAttribute : Attribute
     {
         /// <summary>
-        /// An HTML link to the documentation explaining the behavior or condition.
+        /// Creates a new instance of <see cref="HelpLinkAttribute"/>.
         /// </summary>
-        public string HelpLink { get; private set; }
-
+        /// <param name="helpLink">The HTML link to the documentation explaining the behavior or condition.</param>
         public HelpLinkAttribute(string helpLink)
         {
             HelpLink = helpLink;
         }
+
+        /// <summary>
+        /// An HTML link to the documentation explaining the behavior or condition.
+        /// </summary>
+        public string HelpLink { get; private set; }
     }
 }

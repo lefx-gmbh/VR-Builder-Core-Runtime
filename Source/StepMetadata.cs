@@ -4,7 +4,7 @@
 
 using System;
 using System.Runtime.Serialization;
-using UnityEngine;
+using VRBuilder.Core.Primitives;
 
 namespace VRBuilder.Core
 {
@@ -16,7 +16,7 @@ namespace VRBuilder.Core
         /// <summary>
         /// Graphical position of current <see cref="IStep"/> on the 'Workflow' window.
         /// </summary>
-        public Vector2 Position { get; set; }
+        public IVector2 Position { get; set; }
 
         /// <summary>
         /// Graphical representation of current <see cref="IStep"/> on the 'Workflow' window.

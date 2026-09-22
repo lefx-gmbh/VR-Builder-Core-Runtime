@@ -12,20 +12,24 @@ namespace VRBuilder.Core
     public class ProcessEventArgs : EventArgs
     {
         /// <summary>
-        /// Active process.
-        /// </summary>
-        public readonly IProcess Process;
-
-        /// <summary>
         /// Active Chapter.
         /// </summary>
         public readonly IChapter Chapter;
+
+        /// <summary>
+        /// Active process.
+        /// </summary>
+        public readonly IProcess Process;
 
         /// <summary>
         /// Active Step.
         /// </summary>
         public readonly IStep Step;
 
+        /// <summary>
+        /// Creates event args for the given process, capturing its current chapter and step.
+        /// </summary>
+        /// <param name="process">The active process.</param>
         public ProcessEventArgs(IProcess process)
         {
             Process = process;

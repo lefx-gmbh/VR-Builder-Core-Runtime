@@ -12,6 +12,17 @@ namespace VRBuilder.Core
     public abstract class StageProcess<TData> : IStageProcess where TData : class, IData
     {
         /// <summary>
+        /// Creates a stage process for the given data.
+        /// </summary>
+        /// <param name="data">The entity's data.</param>
+        /// <param name="outer">The entity owning the data, or <c>null</c>.</param>
+        protected StageProcess(TData data, IEntity outer = null)
+        {
+            Data = data;
+            Outer = outer;
+        }
+
+        /// <summary>
         /// The entity's data.
         /// </summary>
         protected TData Data { get; }
@@ -20,12 +31,6 @@ namespace VRBuilder.Core
         /// The entity owning the data.
         /// </summary>
         protected IEntity Outer { get; }
-
-        protected StageProcess(TData data, IEntity outer = null)
-        {
-            Data = data;
-            Outer = outer;
-        }
 
         /// <inheritdoc />
         public abstract void Start();

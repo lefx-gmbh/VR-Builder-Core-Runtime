@@ -13,6 +13,12 @@ namespace VRBuilder.Core.Properties.Operations
             return leftOperand && rightOperand;
         }
 
+        /// <summary>
+        /// Returns the operator symbol.
+        /// </summary>
+        /// <param name="format">The format string.</param>
+        /// <param name="formatProvider">The format provider.</param>
+        /// <returns>The operator symbol.</returns>
         public string ToString(string format, IFormatProvider formatProvider)
         {
             return "&&";

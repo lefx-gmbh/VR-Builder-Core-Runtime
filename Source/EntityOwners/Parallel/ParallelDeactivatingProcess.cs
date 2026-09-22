@@ -1,8 +1,11 @@
 // Copyright (c) 2013-2019 Innoactive GmbH
 // Licensed under the Apache License, Version 2.0
 // Modifications copyright (c) 2021-2026 MindPort GmbH
+// Modifications copyright (c) 2026 Aron Schaub
+// SPDX-License-Identifier: Apache-2.0
 
 using System.Collections;
+using System.Linq;
 using VRBuilder.Core.Configuration.Modes;
 
 namespace VRBuilder.Core.EntityOwners.ParallelEntityCollection
@@ -19,20 +22,16 @@ namespace VRBuilder.Core.EntityOwners.ParallelEntityCollection
         /// <inheritdoc />
         public override void Start()
         {
-            IEntity[] children = RuntimeEntityGraph.GetChildren(Data);
-            for (int i = 0; i < children.Length; i++)
+            foreach (IEntity child in Data.GetChildren().Where(child => !Data.Mode.CheckIfSkipped(child.GetType())))
             {
-                if (Data.Mode.CheckIfSkipped(children[i].GetType()) == false)
-                {
-                    children[i].LifeCycle.Deactivate();
-                }
+                child.LifeCycle.Deactivate();
             }
         }
 
         /// <inheritdoc />
         public override IEnumerator Update()
         {
-            while (HasBlockingChildInStage(Stage.Deactivating))
+            while (GetBlockingChildren(Data, Data.Mode).Any(child => child.LifeCycle.Stage == Stage.Deactivating))
             {
                 yield return null;
             }
@@ -41,13 +40,9 @@ namespace VRBuilder.Core.EntityOwners.ParallelEntityCollection
         /// <inheritdoc />
         public override void End()
         {
-            IEntity[] children = RuntimeEntityGraph.GetChildren(Data);
-            for (int i = 0; i < children.Length; i++)
+            foreach (IEntity child in Data.GetChildren().Where(child => child.LifeCycle.Stage != Stage.Inactive))
             {
-                if (children[i].LifeCycle.Stage != Stage.Inactive)
-                {
-                    children[i].LifeCycle.MarkToFastForward();
-                }
+                child.LifeCycle.MarkToFastForward();
             }
         }
 

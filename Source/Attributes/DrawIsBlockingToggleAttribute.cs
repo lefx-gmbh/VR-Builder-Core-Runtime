@@ -8,7 +8,7 @@ using System.Reflection;
 namespace VRBuilder.Core.Attributes
 {
     /// <summary>
-    /// Declares that the "Is Blocking" toggle has to be drawn, if the behavior implements <see cref="IBackgroundBehaviorData"/>.
+    /// Declares that the "Is Blocking" toggle has to be drawn, if the behavior implements <see cref="VRBuilder.Core.Behaviors.IBackgroundBehaviorData"/>.
     /// </summary>
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
     public class DrawIsBlockingToggleAttribute : MetadataAttribute

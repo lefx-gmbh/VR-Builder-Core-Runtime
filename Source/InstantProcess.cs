@@ -11,6 +11,10 @@ namespace VRBuilder.Core
     /// </summary>
     public abstract class InstantProcess<TData> : StageProcess<TData> where TData : class, IData
     {
+        /// <summary>
+        /// Creates an instant process for the given data.
+        /// </summary>
+        /// <param name="data">The entity's data.</param>
         protected InstantProcess(TData data) : base(data)
         {
         }

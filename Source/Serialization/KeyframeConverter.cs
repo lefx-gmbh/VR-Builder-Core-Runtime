@@ -1,20 +1,38 @@
+using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System;
-using UnityEngine;
+using VRBuilder.Core.Primitives;
 
 namespace VRBuilder.Core.Serialization
 {
     /// <summary>
-    /// Converter that serializes and deserializes <see cref="Keyframe"/>.
+    /// Converter that serializes <see cref="IKeyframe"/> and deserializes <see cref="KeyframeData"/>.
     /// </summary>
     [NewtonsoftConverter]
     public class KeyframeConverter : JsonConverter
     {
         /// <inheritdoc/>
-        public override bool CanConvert(Type objectType)
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            return typeof(Keyframe) == objectType;
+            switch (value)
+            {
+                case null:
+                    writer.WriteNull();
+                    return;
+                case IKeyframe keyframe:
+                    new JObject
+                    {
+                        { "Time", keyframe.Time },
+                        { "Value", keyframe.Value },
+                        { "InTangent", keyframe.InTangent },
+                        { "OutTangent", keyframe.OutTangent },
+                        { "WeightedMode", keyframe.WeightedMode },
+                    }.WriteTo(writer);
+                    break;
+                default:
+                    ForwardingLogger.LogWarning(new JsonSerializationException($"Expected {nameof(IKeyframe)} but received {value.GetType().FullName}."));
+                    break;
+            }
         }
 
         /// <inheritdoc/>
@@ -22,30 +40,31 @@ namespace VRBuilder.Core.Serialization
         {
             if (reader.TokenType == JsonToken.StartObject)
             {
-                JObject data = (JObject)JToken.ReadFrom(reader);
-                Keyframe keyframe = new Keyframe(data["Time"].Value<float>(), data["Value"].Value<float>(), data["InTangent"].Value<float>(), data["OutTangent"].Value<float>(), data["InWeight"].Value<float>(), data["OutWeight"].Value<float>());
-                keyframe.weightedMode = (WeightedMode)data["WeightedMode"].Value<int>();
-                return keyframe;
+                try
+                {
+                    var data = JObject.Load(reader);
+
+                    float time = data["Time"]?.Value<float>() ?? 0;
+                    float value = data["Value"]?.Value<float>() ?? 0;
+                    float inTangent = data["InTangent"]?.Value<float>() ?? 0;
+                    float outTangent = data["OutTangent"]?.Value<float>() ?? 0;
+                    int weightedMode = data["WeightedMode"]?.Value<int>() ?? 0;
+
+                    return new KeyframeData(time, value, inTangent, outTangent, weightedMode);
+                }
+                catch (Exception ex)
+                {
+                    ForwardingLogger.LogWarning(new JsonSerializationException($"Failed to deserialize {nameof(KeyframeData)} from JSON {SerializationLoggingHelper.FormatJsonLocation(ex)}.", ex));
+                }
             }
 
-            return new Keyframe();
+            return new KeyframeData();
         }
 
         /// <inheritdoc/>
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        public override bool CanConvert(Type objectType)
         {
-            Keyframe keyframe = (Keyframe)value;            
-            JObject data = new JObject();
-            
-            data.Add("Time", keyframe.time);
-            data.Add("Value", keyframe.value);
-            data.Add("InTangent", keyframe.inTangent);
-            data.Add("OutTangent", keyframe.outTangent);
-            data.Add("InWeight", keyframe.inWeight);
-            data.Add("OutWeight", keyframe.outWeight);
-            data.Add("WeightedMode", (int)keyframe.weightedMode);
-
-            data.WriteTo(writer);
+            return typeof(IKeyframe).IsAssignableFrom(objectType);
         }
     }
 }

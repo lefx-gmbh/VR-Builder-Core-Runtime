@@ -16,6 +16,10 @@ namespace VRBuilder.Core
         /// </summary>
         public readonly Stage Stage;
 
+        /// <summary>
+        /// Creates event args for the given stage.
+        /// </summary>
+        /// <param name="stage">The new stage.</param>
         public ActivationStateChangedEventArgs(Stage stage)
         {
             Stage = stage;

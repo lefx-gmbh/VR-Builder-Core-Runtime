@@ -1,4 +1,4 @@
-using UnityEngine.Events;
+using System;
 
 namespace VRBuilder.Core.Properties
 {
@@ -11,7 +11,7 @@ namespace VRBuilder.Core.Properties
         /// <summary>
         /// Raised when the stored value changes.
         /// </summary>
-        UnityEvent<T> OnValueChanged { get; }
+        event Action<T> ValueChanged;
 
         /// <summary>
         /// Returns the value.

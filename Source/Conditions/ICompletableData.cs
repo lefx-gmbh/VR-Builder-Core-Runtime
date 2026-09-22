@@ -4,8 +4,14 @@
 
 namespace VRBuilder.Core.Conditions
 {
+    /// <summary>
+    /// Data for an entity that can be completed.
+    /// </summary>
     public interface ICompletableData : IData
     {
+        /// <summary>
+        /// True if this data's owning entity is completed.
+        /// </summary>
         bool IsCompleted { get; set; }
     }
 }

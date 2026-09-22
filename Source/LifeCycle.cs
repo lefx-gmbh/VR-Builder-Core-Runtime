@@ -5,7 +5,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using VRBuilder.Core.Exceptions;
 using VRBuilder.Core.Utils;
 
@@ -16,12 +15,6 @@ namespace VRBuilder.Core
     /// </summary>
     public sealed class LifeCycle : ILifeCycle
     {
-        private bool deactivateAfterActivation;
-        private IEnumerator update;
-        private IStageProcess process;
-
-        private bool IsCurrentStageProcessFinished => update == null;
-
         private readonly Dictionary<Stage, bool> fastForwardedStates = new Dictionary<Stage, bool>
         {
             { Stage.Inactive, false },
@@ -31,12 +24,27 @@ namespace VRBuilder.Core
             { Stage.Aborting, false },
         };
 
-        private IEntity Owner { get; set; }
+        private bool deactivateAfterActivation;
+        private IStageProcess process;
+        private IEnumerator update;
 
+        /// <summary>
+        /// Creates a lifecycle for the given entity.
+        /// </summary>
+        /// <param name="owner">The entity whose lifecycle is managed.</param>
         public LifeCycle(IEntity owner)
         {
             Stage = Stage.Inactive;
             Owner = owner;
+        }
+
+        private bool IsCurrentStageProcessFinished => update == null;
+
+        private IEntity Owner { get; set; }
+
+        private bool IsInFastForward
+        {
+            get { return fastForwardedStates[Stage]; }
         }
 
         ///<inheritdoc />
@@ -256,11 +264,6 @@ namespace VRBuilder.Core
             ChangeStage(Stage.Inactive);
         }
 
-        private bool IsInFastForward
-        {
-            get { return fastForwardedStates[Stage]; }
-        }
-
         private void SetCurrentStageProcess()
         {
             switch (Stage)
@@ -311,7 +314,7 @@ namespace VRBuilder.Core
         private void LogException(Exception exception, string function)
         {
             string path = EntityPathUtils.BuildRichTextEntityPath(Owner);
-            Debug.LogError($"Exception at {path} while <b>{Stage} ({function})</b>\n{exception}");
+            ForwardingLogger.LogError($"Exception at {path} while <b>{Stage} ({function})</b>\n{exception}");
         }
     }
 }

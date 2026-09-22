@@ -9,13 +9,17 @@ namespace VRBuilder.Core.Attributes
     public class DisplayTooltipAttribute : Attribute
     {
         /// <summary>
-        /// Tooltip of the process entity's property or field.
+        /// Creates a new instance of <see cref="DisplayTooltipAttribute"/>.
         /// </summary>
-        public string Tooltip { get; private set; }
-
+        /// <param name="tooltip">The tooltip of the process entity's property or field.</param>
         public DisplayTooltipAttribute(string tooltip)
         {
             Tooltip = tooltip;
         }
+
+        /// <summary>
+        /// Tooltip of the process entity's property or field.
+        /// </summary>
+        public string Tooltip { get; private set; }
     }
 }

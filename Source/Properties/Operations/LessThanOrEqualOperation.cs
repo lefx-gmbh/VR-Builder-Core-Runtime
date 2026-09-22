@@ -3,7 +3,7 @@ using System;
 namespace VRBuilder.Core.Properties.Operations
 {
     /// <summary>
-    /// True if left <= right.
+    /// True if left &lt;= right.
     /// </summary>
     public class LessThanOrEqualOperation<T> : IOperationCommand<T, bool> where T : IComparable<T>
     {
@@ -13,6 +13,12 @@ namespace VRBuilder.Core.Properties.Operations
             return leftOperand != null && leftOperand.CompareTo(rightOperand) <= 0;
         }
 
+        /// <summary>
+        /// Returns the operator symbol.
+        /// </summary>
+        /// <param name="format">The format string.</param>
+        /// <param name="formatProvider">The format provider.</param>
+        /// <returns>The operator symbol.</returns>
         public string ToString(string format, IFormatProvider formatProvider)
         {
             return "<=";
@@ -23,9 +29,9 @@ namespace VRBuilder.Core.Properties.Operations
         /// </summary>
         private class AOTHelper
         {
+            LessThanOrEqualOperation<bool> bln = new LessThanOrEqualOperation<bool>();
             LessThanOrEqualOperation<float> flt = new LessThanOrEqualOperation<float>();
             LessThanOrEqualOperation<string> str = new LessThanOrEqualOperation<string>();
-            LessThanOrEqualOperation<bool> bln = new LessThanOrEqualOperation<bool>();
         }
     }
 }

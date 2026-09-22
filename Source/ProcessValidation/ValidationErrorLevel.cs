@@ -9,9 +9,24 @@ namespace VRBuilder.Core.ProcessValidation
     /// </summary>
     public enum ValidationErrorLevel
     {
+        /// <summary>
+        /// A suggestion that does not affect the correctness of the process.
+        /// </summary>
         HINT,
+
+        /// <summary>
+        /// A potential issue that may cause unintended behavior.
+        /// </summary>
         WARNING,
+
+        /// <summary>
+        /// An issue that prevents the affected part from behaving correctly.
+        /// </summary>
         ERROR,
+
+        /// <summary>
+        /// An issue that makes the process unusable.
+        /// </summary>
         FATAL
     }
 }

@@ -1,8 +1,10 @@
-using Newtonsoft.Json;
+// Modifications copyright (c) 2026 Aron Schaub
+// SPDX-License-Identifier: Apache-2.0
+
 using System;
 using System.Collections;
 using System.Runtime.Serialization;
-using UnityEngine.Scripting;
+using Newtonsoft.Json;
 using VRBuilder.Core.Attributes;
 using VRBuilder.Core.Properties;
 using VRBuilder.Core.SceneObjects;
@@ -18,12 +20,46 @@ namespace VRBuilder.Core.Behaviors
     public class ResetValueBehavior : Behavior<ResetValueBehavior.EntityData>
     {
         /// <summary>
-        /// The <see cref="ResetValueBehavior{T}"/> behavior data.
+        /// Creates a new <see cref="ResetValueBehavior"/>; the target property must be configured later.
+        /// </summary>
+        [JsonConstructor]
+        public ResetValueBehavior() : this(Guid.Empty)
+        {
+        }
+
+        /// <summary>
+        /// Creates a behavior that resets the data property identified by <paramref name="propertyId"/>.
+        /// </summary>
+        /// <param name="propertyId">Unique id of the data property to reset.</param>
+        public ResetValueBehavior(Guid propertyId)
+        {
+            Data.Properties = new MultipleScenePropertyReference<IDataPropertyBase>(propertyId);
+        }
+
+        /// <summary>
+        /// Creates a behavior that resets <paramref name="property"/> to its default value.
+        /// </summary>
+        /// <param name="property">Data property to reset.</param>
+        public ResetValueBehavior(IDataPropertyBase property) : this(ProcessReferenceUtils.GetUniqueIdFrom(property))
+        {
+        }
+
+        /// <inheritdoc />
+        public override IStageProcess GetActivatingProcess()
+        {
+            return new ActivatingProcess(Data);
+        }
+
+        /// <summary>
+        /// The <see cref="ResetValueBehavior"/> behavior data.
         /// </summary>
         [DisplayName("Reset Value")]
         [DataContract(IsReference = true)]
         public class EntityData : IBehaviorData
         {
+            /// <summary>
+            /// Data properties that are reset to their default values on activation.
+            /// </summary>
             [DataMember]
             [DisplayName("Data Properties")]
             public MultipleScenePropertyReference<IDataPropertyBase> Properties;
@@ -66,26 +102,6 @@ namespace VRBuilder.Core.Behaviors
             public override void FastForward()
             {
             }
-        }
-
-        [JsonConstructor, Preserve]
-        public ResetValueBehavior() : this(Guid.Empty)
-        {
-        }
-
-        public ResetValueBehavior(Guid propertyId)
-        {
-            Data.Properties = new MultipleScenePropertyReference<IDataPropertyBase>(propertyId);
-        }
-
-        public ResetValueBehavior(IDataPropertyBase property) : this(ProcessReferenceUtils.GetUniqueIdFrom(property))
-        {
-        }
-
-        /// <inheritdoc />
-        public override IStageProcess GetActivatingProcess()
-        {
-            return new ActivatingProcess(Data);
         }
     }
 }

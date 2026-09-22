@@ -4,6 +4,9 @@
 
 namespace VRBuilder.Core.Behaviors
 {
+    /// <summary>
+    /// Data required by a behavior.
+    /// </summary>
     public interface IBehaviorData : INamedData
     {
     }

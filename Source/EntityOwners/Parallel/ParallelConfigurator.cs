@@ -1,6 +1,8 @@
 // Copyright (c) 2013-2019 Innoactive GmbH
 // Licensed under the Apache License, Version 2.0
 // Modifications copyright (c) 2021-2026 MindPort GmbH
+// Modifications copyright (c) 2026 Aron Schaub
+// SPDX-License-Identifier: Apache-2.0
 
 using VRBuilder.Core.Configuration.Modes;
 
@@ -11,6 +13,10 @@ namespace VRBuilder.Core.EntityOwners
     /// </summary>
     public class ParallelConfigurator<TEntity> : Configurator<IEntityCollectionDataWithMode<TEntity>> where TEntity : IEntity
     {
+        /// <summary>
+        /// Creates a configurator for the given entity collection data.
+        /// </summary>
+        /// <param name="data">The collection data to configure.</param>
         public ParallelConfigurator(IEntityCollectionDataWithMode<TEntity> data) : base(data)
         {
         }
@@ -53,11 +59,11 @@ namespace VRBuilder.Core.EntityOwners
                             child.LifeCycle.MarkToFastForwardStage(Stage.Activating);
                             child.LifeCycle.MarkToFastForwardStage(Stage.Active);
                         }
-
-                        if (stage == Stage.Activating || stage == Stage.Active)
+                        else if (stage is Stage.Activating or Stage.Active)
                         {
                             child.LifeCycle.Activate();
                         }
+
                     }
                 }
 

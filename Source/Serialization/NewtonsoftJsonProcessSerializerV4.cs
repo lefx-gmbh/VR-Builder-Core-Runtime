@@ -2,14 +2,13 @@
 // Licensed under the Apache License, Version 2.0
 // Modifications copyright (c) 2021-2026 MindPort GmbH
 
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
-using UnityEngine;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using VRBuilder.Core.Behaviors;
 using VRBuilder.Core.Configuration.Modes;
 using VRBuilder.Core.EntityOwners;
@@ -22,9 +21,12 @@ namespace VRBuilder.Core.Serialization
     /// </summary>
     public class NewtonsoftJsonProcessSerializerV4 : NewtonsoftJsonProcessSerializer
     {
+        private static readonly JsonSerializerSettings TolerantSerializerSettings = CreateTolerantSerializerSettings();
+
         /// <inheritdoc/>
         public override string Name { get; } = "Newtonsoft Json Importer v4";
 
+        /// <inheritdoc/>
         protected override int Version { get; } = 4;
 
         /// <inheritdoc/>
@@ -39,16 +41,18 @@ namespace VRBuilder.Core.Serialization
             {
                 return base.ProcessFromByteArray(data);
             }
+
             if (version == 2)
             {
                 return new ImprovedNewtonsoftJsonProcessSerializer().ProcessFromByteArray(data);
             }
+
             if (version == 3)
             {
                 return new NewtonsoftJsonProcessSerializerV3().ProcessFromByteArray(data);
             }
 
-            ProcessWrapper wrapper = Deserialize<ProcessWrapper>(data, ProcessSerializerSettings);
+            ProcessWrapper wrapper = Deserialize<ProcessWrapper>(data, TolerantSerializerSettings);
             return wrapper.GetProcess();
         }
 
@@ -66,7 +70,7 @@ namespace VRBuilder.Core.Serialization
             }
             catch (Exception ex)
             {
-                Debug.LogError(ex.Message);
+                ForwardingLogger.LogError(ex.Message);
             }
 
             // This line is required to undo the changes applied to the process.
@@ -87,17 +91,36 @@ namespace VRBuilder.Core.Serialization
             {
                 return base.ChapterFromByteArray(data);
             }
+
             if (version == 2)
             {
                 return new ImprovedNewtonsoftJsonProcessSerializer().ChapterFromByteArray(data);
             }
+
             if (version == 3)
             {
                 return new NewtonsoftJsonProcessSerializerV3().ChapterFromByteArray(data);
             }
 
-            ChapterWrapper wrapper = Deserialize<ChapterWrapper>(data, ProcessSerializerSettings);
+            ChapterWrapper wrapper = Deserialize<ChapterWrapper>(data, TolerantSerializerSettings);
             return wrapper.GetChapter();
+        }
+
+        /// <summary>
+        /// Creates V4 deserialization settings that recover invalid behavior and condition entries.
+        /// </summary>
+        /// <returns>The standard process settings with the recovery converter applied first.</returns>
+        private static JsonSerializerSettings CreateTolerantSerializerSettings()
+        {
+            return new JsonSerializerSettings
+            {
+                Converters = new[] { new BrokenEntityConverter() }.Concat(ProcessSerializerSettings.Converters).ToList(),
+                PreserveReferencesHandling = ProcessSerializerSettings.PreserveReferencesHandling,
+                Formatting = ProcessSerializerSettings.Formatting,
+                ConstructorHandling = ProcessSerializerSettings.ConstructorHandling,
+                SerializationBinder = ProcessSerializerSettings.SerializationBinder,
+                TypeNameHandling = ProcessSerializerSettings.TypeNameHandling
+            };
         }
 
         /// <inheritdoc/>
@@ -114,7 +137,7 @@ namespace VRBuilder.Core.Serialization
             }
             catch (Exception ex)
             {
-                Debug.LogError(ex.Message);
+                ForwardingLogger.LogError(ex.Message);
             }
 
             // This line is required to undo the changes applied to the process.
@@ -127,13 +150,13 @@ namespace VRBuilder.Core.Serialization
         private class ChapterWrapper : Wrapper
         {
             [DataMember]
-            public List<IChapter> SubChapters = new List<IChapter>();
+            public IChapter Chapter;
 
             [DataMember]
             public List<IStep> Steps = new List<IStep>();
 
             [DataMember]
-            public IChapter Chapter;
+            public List<IChapter> SubChapters = new List<IChapter>();
 
             public ChapterWrapper()
             {
@@ -224,13 +247,13 @@ namespace VRBuilder.Core.Serialization
         private class ProcessWrapper : Wrapper
         {
             [DataMember]
-            public List<IChapter> SubChapters = new List<IChapter>();
+            public IProcess Process;
 
             [DataMember]
             public List<IStep> Steps = new List<IStep>();
 
             [DataMember]
-            public IProcess Process;
+            public List<IChapter> SubChapters = new List<IChapter>();
 
             public ProcessWrapper()
             {

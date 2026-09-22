@@ -1,4 +1,4 @@
-using UnityEngine;
+using VRBuilder.Core.Primitives;
 
 namespace VRBuilder.Core.Properties
 {
@@ -11,12 +11,12 @@ namespace VRBuilder.Core.Properties
         /// Get a point on the path.
         /// </summary>
         /// <param name="t">Position on the path, 0 to 1.</param>
-        Vector3 GetPoint(float t);
+        IVector3 GetPoint(float t);
 
         /// <summary>
         /// Get the direction of the path in a given position.
         /// </summary>
         /// <param name="t">Position on the path, 0 to 1.</param>
-        Vector3 GetDirection(float t);
+        IVector3 GetDirection(float t);
     }
 }

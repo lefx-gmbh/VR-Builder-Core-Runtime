@@ -13,13 +13,17 @@ namespace VRBuilder.Core.Attributes
     public class DisplayNameAttribute : Attribute
     {
         /// <summary>
-        /// Name of the process entity's property or field.
+        /// Creates a new instance of <see cref="DisplayNameAttribute"/>.
         /// </summary>
-        public string Name { get; private set; }
-
+        /// <param name="name">The name of the process entity's property or field.</param>
         public DisplayNameAttribute(string name)
         {
             Name = name;
         }
+
+        /// <summary>
+        /// Name of the process entity's property or field.
+        /// </summary>
+        public string Name { get; private set; }
     }
 }

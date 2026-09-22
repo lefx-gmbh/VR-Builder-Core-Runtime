@@ -27,13 +27,20 @@ namespace VRBuilder.Core.RestrictiveEnvironment
         public string Type;
 
         [IgnoreDataMember]
-        private LockableProperty property;
+        private ILockableProperty property;
 
+        /// <summary>
+        /// Initializes an empty <see cref="LockablePropertyReference"/> that is resolved lazily on first <see cref="GetProperty"/> call.
+        /// </summary>
         public LockablePropertyReference()
         {
         }
 
-        public LockablePropertyReference(LockableProperty property)
+        /// <summary>
+        /// Initializes a <see cref="LockablePropertyReference"/> that points to the given property's scene object and type.
+        /// </summary>
+        /// <param name="property">The lockable property to reference; must not be <c>null</c>.</param>
+        public LockablePropertyReference(ILockableProperty property)
         {
             TargetObject = new SingleSceneObjectReference(property.SceneObject.Guid);
             Type = property.GetType().AssemblyQualifiedName;
@@ -42,7 +49,7 @@ namespace VRBuilder.Core.RestrictiveEnvironment
         /// <summary>
         /// Returns the referenced <see cref="LockableProperty"/>.
         /// </summary>
-        public LockableProperty GetProperty()
+        public ILockableProperty GetProperty()
         {
             if (property == null)
             {
@@ -50,7 +57,7 @@ namespace VRBuilder.Core.RestrictiveEnvironment
                 {
                     if (prop.GetType().AssemblyQualifiedName.Equals(Type))
                     {
-                        property = (LockableProperty)prop;
+                        property = (ILockableProperty)prop;
                         break;
                     }
                 }

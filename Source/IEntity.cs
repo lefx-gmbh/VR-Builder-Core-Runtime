@@ -8,9 +8,12 @@ using VRBuilder.Core.Configuration.Modes;
 namespace VRBuilder.Core
 {
     /// <summary>
-    /// The basic interface for all components of a process: behaviors, conditions, transitions, and so on.
-    /// Do not implement this interface directly.
-    /// Use Behavior or Condition abstract classes instead.
+    /// Base contract for every component of a process (chapters, steps, behaviors, conditions, transitions).
+    /// An entity owns an <see cref="ILifeCycle"/> that drives it through the <see cref="Stage"/>s; for each
+    /// stage it provides the matching <see cref="IStageProcess"/> via the Get*Process methods, and
+    /// <see cref="Configure"/> wires the entity to the active process mode.
+    /// Do not implement this interface directly — derive from <c>Behavior</c>, <c>Condition</c>,
+    /// <c>Step</c>, <c>Chapter</c> or <c>Process</c> instead.
     /// </summary>
     public interface IEntity
     {
@@ -28,6 +31,11 @@ namespace VRBuilder.Core
         /// The entity's life cycle.
         /// </summary>
         ILifeCycle LifeCycle { get; }
+
+        /// <summary>
+        /// Entity parent to this entity.
+        /// </summary>
+        IEntity Parent { get; set; }
 
         /// <summary>
         /// Returns a new instance of a process for the Activating <seealso cref="Stage"/>.
@@ -58,10 +66,5 @@ namespace VRBuilder.Core
         /// Called every frame during the Unity's update.
         /// </summary>
         void Update();
-
-        /// <summary>
-        /// Entity parent to this entity.
-        /// </summary>
-        IEntity Parent { get; set; }
     }
 }

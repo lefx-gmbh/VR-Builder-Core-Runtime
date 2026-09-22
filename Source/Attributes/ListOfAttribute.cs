@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
-using UnityEngine;
 
 namespace VRBuilder.Core.Attributes
 {
@@ -45,7 +44,7 @@ namespace VRBuilder.Core.Attributes
 
             if (uniqueTypes.Length != childAttributes.Length)
             {
-                Debug.LogError("Child attributes of ListOf attribute have to be unique. Duplicates are omitted.");
+                ForwardingLogger.LogError("Child attributes of ListOf attribute have to be unique. Duplicates are omitted.");
             }
 
             this.childAttributes = new List<MetadataAttribute>(uniqueTypes.Where(attribute => typeof(MetadataAttribute).IsAssignableFrom(attribute))

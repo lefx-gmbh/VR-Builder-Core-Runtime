@@ -1,6 +1,8 @@
 // Copyright (c) 2013-2019 Innoactive GmbH
 // Licensed under the Apache License, Version 2.0
 // Modifications copyright (c) 2021-2026 MindPort GmbH
+// Modifications copyright (c) 2026 Aron Schaub
+// SPDX-License-Identifier: Apache-2.0
 
 using System.Collections;
 using VRBuilder.Core.Configuration.Modes;
@@ -12,6 +14,10 @@ namespace VRBuilder.Core.EntityOwners
     /// </summary>
     public abstract class EntityIteratingProcess<TEntitySequenceDataWithMode, TEntity> : StageProcess<TEntitySequenceDataWithMode> where TEntity : IEntity where TEntitySequenceDataWithMode : class, IEntitySequenceDataWithMode<TEntity>
     {
+        /// <summary>
+        /// Creates a process that iterates over the entities of the given sequence data.
+        /// </summary>
+        /// <param name="data">The sequence data holding the entities to iterate over.</param>
         protected EntityIteratingProcess(TEntitySequenceDataWithMode data) : base(data)
         {
         }
@@ -36,7 +42,7 @@ namespace VRBuilder.Core.EntityOwners
                     continue;
                 }
 
-                while (ShouldActivateCurrent() == false)
+                while (!ShouldActivateCurrent())
                 {
                     yield return null;
                 }
@@ -53,7 +59,7 @@ namespace VRBuilder.Core.EntityOwners
                     yield return null;
                 }
 
-                while (ShouldDeactivateCurrent() == false)
+                while (!ShouldDeactivateCurrent())
                 {
                     yield return null;
                 }
@@ -92,7 +98,7 @@ namespace VRBuilder.Core.EntityOwners
 
                 current.LifeCycle.MarkToFastForward();
 
-                if (current.LifeCycle.Stage == Stage.Activating || current.LifeCycle.Stage == Stage.Active)
+                if (current.LifeCycle.Stage is Stage.Activating or Stage.Active)
                 {
                     current.LifeCycle.Deactivate();
                 }

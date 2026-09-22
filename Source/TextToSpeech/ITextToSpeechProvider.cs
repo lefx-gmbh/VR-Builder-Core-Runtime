@@ -1,7 +1,10 @@
+// Modifications copyright (c) 2026 Aron Schaub
+// SPDX-License-Identifier: Apache-2.0
+
 using System.Threading.Tasks;
-using UnityEngine;
-using UnityEngine.Localization;
+using VRBuilder.Core.Primitives;
 using VRBuilder.Core.TextToSpeech.Configuration;
+using VRBuilder.Core.TextToSpeech.Utils;
 
 namespace VRBuilder.Core.TextToSpeech.Providers
 {
@@ -13,22 +16,19 @@ namespace VRBuilder.Core.TextToSpeech.Providers
         /// <summary>
         /// Used for setting the config file.
         /// </summary>
-        void SetConfig(ITextToSpeechConfiguration configuration);
+        void SetConfig(ITextToSpeechProviderConfiguration providerConfiguration);
 
         /// <summary>
         /// Loads the AudioClip file for the given text.
         /// </summary>
-        /// <param name="key">unique identifier of the original text can be either LanguageTable key or md5hash of untranslated text</param>
-        /// <param name="text">translated text</param>
-        /// <param name="locale">locale of translated text</param>
-        /// <param name="speaker">used speaker, if the provider supports it</param>
+        /// <param name="requestFileLocator">Properties containing all information about the text-to-speech audio data.</param>
         /// <returns>ready to play Audioclip</returns>
-        Task<AudioClip> ConvertTextToSpeech(string key, string text, Locale locale, string speaker = "");
+        Task<IAudioClip> ConvertTextToSpeech(ITextToSpeechFileLocator requestFileLocator);
 
         /// <summary>
         /// Load config while editor- and runtime
         /// </summary>
         /// <returns>Returns configuration for the provider if successful</returns>
-        public ITextToSpeechConfiguration LoadConfig();
+        public ITextToSpeechProviderConfiguration LoadConfig();
     }
 }

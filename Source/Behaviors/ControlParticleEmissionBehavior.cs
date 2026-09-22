@@ -1,8 +1,7 @@
-using Newtonsoft.Json;
 using System.Collections;
 using System.Linq;
 using System.Runtime.Serialization;
-using UnityEngine.Scripting;
+using Newtonsoft.Json;
 using VRBuilder.Core.Attributes;
 using VRBuilder.Core.Properties;
 using VRBuilder.Core.SceneObjects;
@@ -16,6 +15,30 @@ namespace VRBuilder.Core.Behaviors
     [HelpLink("https://mindport-gmbh.github.io/VR-Builder-Documentation/articles/core/start-particle-emission-behavior.html?utm_source=unity_editor&utm_medium=referral&utm_campaign=from_unity&utm_id=from_unity")]
     public class ControlParticleEmissionBehavior : Behavior<ControlParticleEmissionBehavior.EntityData>
     {
+        /// <summary>
+        /// Creates an empty particle emission behavior, used by the JSON deserializer.
+        /// </summary>
+        [JsonConstructor]
+        public ControlParticleEmissionBehavior() : this(default)
+        {
+        }
+
+        /// <summary>
+        /// Creates a behavior that starts or stops particle emission on the configured particle systems.
+        /// </summary>
+        /// <param name="emitParticles">If <c>true</c>, particle emission starts, else it stops.</param>
+        public ControlParticleEmissionBehavior(bool emitParticles)
+        {
+            Data.EmitParticles = emitParticles;
+            Data.Targets = new MultipleScenePropertyReference<IParticleSystemProperty>();
+        }
+
+        /// <inheritdoc />
+        public override IStageProcess GetActivatingProcess()
+        {
+            return new ActivatingProcess(Data);
+        }
+
         /// <summary>
         /// The <see cref="ControlParticleEmissionBehavior"/> behavior data.
         /// </summary>        
@@ -84,23 +107,6 @@ namespace VRBuilder.Core.Behaviors
             public override void FastForward()
             {
             }
-        }
-
-        [JsonConstructor, Preserve]
-        public ControlParticleEmissionBehavior() : this(default)
-        {
-        }
-
-        public ControlParticleEmissionBehavior(bool emitParticles)
-        {
-            Data.EmitParticles = emitParticles;
-            Data.Targets = new MultipleScenePropertyReference<IParticleSystemProperty>();
-        }
-
-        /// <inheritdoc />
-        public override IStageProcess GetActivatingProcess()
-        {
-            return new ActivatingProcess(Data);
         }
     }
 }

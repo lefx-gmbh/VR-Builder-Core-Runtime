@@ -61,6 +61,9 @@ namespace VRBuilder.Core
             return new Dictionary<string, object>();
         }
 
+        /// <summary>
+        /// Clears all stored metadata.
+        /// </summary>
         public void Clear()
         {
             values = new Dictionary<string, Dictionary<string, object>>();

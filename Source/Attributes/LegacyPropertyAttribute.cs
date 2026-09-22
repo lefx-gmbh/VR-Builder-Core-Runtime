@@ -8,13 +8,17 @@ namespace VRBuilder.Core.Attributes
     public class LegacyPropertyAttribute : Attribute
     {
         /// <summary>
-        /// Name of the property replacing this obsolete property.
+        /// Creates a new instance of <see cref="LegacyPropertyAttribute"/>.
         /// </summary>
-        public string NewPropertyName { get; private set; }
-
+        /// <param name="newPropertyName">The name of the property replacing this obsolete property.</param>
         public LegacyPropertyAttribute(string newPropertyName)
         {
             NewPropertyName = newPropertyName;
         }
+
+        /// <summary>
+        /// Name of the property replacing this obsolete property.
+        /// </summary>
+        public string NewPropertyName { get; private set; }
     }
 }

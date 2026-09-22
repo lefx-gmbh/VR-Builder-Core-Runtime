@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 using VRBuilder.Core.Serialization;
 
 namespace VRBuilder.Core.IO
@@ -31,7 +30,7 @@ namespace VRBuilder.Core.IO
             }
             catch (Exception ex)
             {
-                Debug.LogError(ex.Message);
+                ForwardingLogger.LogError(ex.Message);
             }
 
             return null;

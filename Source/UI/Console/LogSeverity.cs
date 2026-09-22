@@ -6,10 +6,29 @@ namespace VRBuilder.UI.Console
     /// </summary>
     public enum LogSeverity
     {
+        /// <summary>
+        /// A regular log message.
+        /// </summary>
         Log,
+
+        /// <summary>
+        /// A warning message.
+        /// </summary>
         Warning,
+
+        /// <summary>
+        /// An error message.
+        /// </summary>
         Error,
+
+        /// <summary>
+        /// An exception message.
+        /// </summary>
         Exception,
+
+        /// <summary>
+        /// An assertion failure message.
+        /// </summary>
         Assert
     }
 }

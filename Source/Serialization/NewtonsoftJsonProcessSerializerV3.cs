@@ -1,14 +1,16 @@
 // Copyright (c) 2013-2019 Innoactive GmbH
 // Licensed under the Apache License, Version 2.0
 // Modifications copyright (c) 2021-2026 MindPort GmbH
+// Modifications copyright (c) 2026 Aron Schaub
+// SPDX-License-Identifier: Apache-2.0
 
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using VRBuilder.Core.Configuration.Modes;
 using VRBuilder.Core.EntityOwners;
 using VRBuilder.Core.Serialization.NewtonsoftJson;
@@ -23,6 +25,7 @@ namespace VRBuilder.Core.Serialization
         /// <inheritdoc/>
         public override string Name { get; } = "Newtonsoft Json Importer v3";
 
+        /// <inheritdoc/>
         protected override int Version { get; } = 3;
 
         /// <inheritdoc/>
@@ -37,6 +40,7 @@ namespace VRBuilder.Core.Serialization
             {
                 return base.ProcessFromByteArray(data);
             }
+
             if (version == 2)
             {
                 return new ImprovedNewtonsoftJsonProcessSerializer().ProcessFromByteArray(data);
@@ -62,10 +66,10 @@ namespace VRBuilder.Core.Serialization
         private class ProcessWrapper
         {
             [DataMember]
-            public List<IStep> Steps = new List<IStep>();
+            public IProcess Process;
 
             [DataMember]
-            public IProcess Process;
+            public List<IStep> Steps = new List<IStep>();
 
             public ProcessWrapper()
             {
@@ -89,6 +93,7 @@ namespace VRBuilder.Core.Serialization
                         }
                     }
                 }
+
                 Process = process;
             }
 

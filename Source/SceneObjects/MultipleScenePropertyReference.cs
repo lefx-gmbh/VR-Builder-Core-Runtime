@@ -1,9 +1,13 @@
+// Modifications copyright (c) 2026 Aron Schaub
+// SPDX-License-Identifier: Apache-2.0
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using VRBuilder.Core.Configuration;
 using VRBuilder.Core.Properties;
+using VRBuilder.Core.Runtime.Registry;
 
 namespace VRBuilder.Core.SceneObjects
 {
@@ -13,10 +17,33 @@ namespace VRBuilder.Core.SceneObjects
     [DataContract(IsReference = true)]
     public class MultipleScenePropertyReference<T> : MultipleSceneReference<T> where T : class, ISceneObjectProperty
     {
+        /// <summary>
+        /// Initializes a new instance of <see cref="MultipleScenePropertyReference{T}"/> referencing no properties.
+        /// </summary>
+        public MultipleScenePropertyReference() : base()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of <see cref="MultipleScenePropertyReference{T}"/> referencing the property with the given guid.
+        /// </summary>
+        /// <param name="guid">The guid of the property this reference should point to.</param>
+        public MultipleScenePropertyReference(Guid guid) : base(guid)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of <see cref="MultipleScenePropertyReference{T}"/> with the given set of guids.
+        /// </summary>
+        /// <param name="guids">The guids this reference should point to.</param>
+        public MultipleScenePropertyReference(IEnumerable<Guid> guids) : base(guids)
+        {
+        }
+
         /// <inheritdoc/>
         protected override IEnumerable<T> DetermineValue(IEnumerable<T> cachedValue)
         {
-            if (RuntimeConfigurator.Exists == false || IsEmpty())
+            if (!ServiceRegistry.Has<IRuntimeService>() || IsEmpty())
             {
                 return new List<T>();
             }
@@ -33,14 +60,10 @@ namespace VRBuilder.Core.SceneObjects
 
             foreach (Guid guid in Guids)
             {
-                value = value.Concat(RuntimeConfigurator.Configuration.SceneObjectRegistry.GetProperties<T>(guid)).Distinct();
+                value = value.Concat(ServiceRegistry.Get<ISceneObjectRegistry>().GetProperties<T>(guid)).Distinct();
             }
 
             return value;
         }
-
-        public MultipleScenePropertyReference() : base() { }
-        public MultipleScenePropertyReference(Guid guid) : base(guid) { }
-        public MultipleScenePropertyReference(IEnumerable<Guid> guids) : base(guids) { }
     }
 }

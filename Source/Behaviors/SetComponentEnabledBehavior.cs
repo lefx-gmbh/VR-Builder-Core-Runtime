@@ -1,9 +1,11 @@
-using Newtonsoft.Json;
+// Modifications copyright (c) 2026 Aron Schaub
+// SPDX-License-Identifier: Apache-2.0
+
 using System;
 using System.Runtime.Serialization;
-using UnityEngine.Scripting;
+using Newtonsoft.Json;
 using VRBuilder.Core.Attributes;
-using VRBuilder.Core.Configuration;
+using VRBuilder.Core.Properties;
 using VRBuilder.Core.SceneObjects;
 
 namespace VRBuilder.Core.Behaviors
@@ -16,6 +18,50 @@ namespace VRBuilder.Core.Behaviors
     public class SetComponentEnabledBehavior : Behavior<SetComponentEnabledBehavior.EntityData>
     {
         /// <summary>
+        /// Creates a new <see cref="SetComponentEnabledBehavior"/>; the target and component type must be configured later.
+        /// </summary>
+        [JsonConstructor]
+        public SetComponentEnabledBehavior() : this(Guid.Empty, "", false, false)
+        {
+        }
+
+        /// <summary>
+        /// Creates a behavior that enables or disables components on the target objects.
+        /// </summary>
+        /// <param name="setEnabled">If <c>true</c>, components are enabled; otherwise they are disabled.</param>
+        /// <param name="name">Display name of the behavior.</param>
+        public SetComponentEnabledBehavior(bool setEnabled, string name = "Set Component Enabled") : this(Guid.Empty, "", setEnabled, false)
+        {
+        }
+
+        /// <summary>
+        /// Creates a behavior that enables or disables components of type <paramref name="componentType"/> on the scene object identified by <paramref name="objectId"/>.
+        /// </summary>
+        /// <param name="objectId">Unique id of the scene object whose components are affected.</param>
+        /// <param name="componentType">Type name of the components to enable or disable.</param>
+        /// <param name="setEnabled">If <c>true</c>, components are enabled; otherwise they are disabled.</param>
+        /// <param name="revertOnDeactivate">If <c>true</c>, the component state reverts to its original state on deactivation.</param>
+        public SetComponentEnabledBehavior(Guid objectId, string componentType, bool setEnabled, bool revertOnDeactivate)
+        {
+            Data.TargetObjects = new MultipleScenePropertyReference<IModifySceneComponentProperty>(objectId);
+            Data.ComponentType = componentType;
+            Data.SetEnabled = setEnabled;
+            Data.RevertOnDeactivation = revertOnDeactivate;
+        }
+
+        /// <inheritdoc />
+        public override IStageProcess GetActivatingProcess()
+        {
+            return new ActivatingProcess(Data);
+        }
+
+        /// <inheritdoc />
+        public override IStageProcess GetDeactivatingProcess()
+        {
+            return new DeactivatingProcess(Data);
+        }
+
+        /// <summary>
         /// The behavior's data.
         /// </summary>
         [DisplayName("Set Component Enabled")]
@@ -27,7 +73,7 @@ namespace VRBuilder.Core.Behaviors
             /// </summary>
             [DataMember]
             [HideInProcessInspector]
-            public MultipleSceneObjectReference TargetObjects { get; set; }
+            public MultipleScenePropertyReference<IModifySceneComponentProperty> TargetObjects { get; set; }
 
             /// <summary>
             /// Type of components to interact with.
@@ -75,10 +121,8 @@ namespace VRBuilder.Core.Behaviors
             /// <inheritdoc />
             public override void Start()
             {
-                foreach (ISceneObject sceneObject in Data.TargetObjects.Values)
-                {
-                    RuntimeConfigurator.Configuration.SceneObjectManager.SetComponentActive(sceneObject, Data.ComponentType, Data.SetEnabled);
-                }
+                foreach (var property in Data.TargetObjects.Values)
+                    property.SetComponentActive(Data.ComponentType, Data.SetEnabled);
             }
         }
 
@@ -93,40 +137,10 @@ namespace VRBuilder.Core.Behaviors
             {
                 if (Data.RevertOnDeactivation)
                 {
-                    foreach (ISceneObject sceneObject in Data.TargetObjects.Values)
-                    {
-                        RuntimeConfigurator.Configuration.SceneObjectManager.SetComponentActive(sceneObject, Data.ComponentType, !Data.SetEnabled);
-                    }
+                    foreach (var property in Data.TargetObjects.Values)
+                        property.SetComponentActive(Data.ComponentType, Data.SetEnabled);
                 }
             }
-        }
-
-        [JsonConstructor, Preserve]
-        public SetComponentEnabledBehavior() : this(Guid.Empty, "", false, false)
-        {
-        }
-
-        public SetComponentEnabledBehavior(bool setEnabled, string name = "Set Component Enabled") : this(Guid.Empty, "", setEnabled, false)
-        {
-        }
-
-        public SetComponentEnabledBehavior(Guid objectId, string componentType, bool setEnabled, bool revertOnDeactivate)
-        {
-            Data.TargetObjects = new MultipleSceneObjectReference(objectId);
-            Data.ComponentType = componentType;
-            Data.SetEnabled = setEnabled;
-            Data.RevertOnDeactivation = revertOnDeactivate;
-        }
-
-        /// <inheritdoc />
-        public override IStageProcess GetActivatingProcess()
-        {
-            return new ActivatingProcess(Data);
-        }
-
-        public override IStageProcess GetDeactivatingProcess()
-        {
-            return new DeactivatingProcess(Data);
         }
     }
 }

@@ -13,13 +13,17 @@ namespace VRBuilder.Core.Attributes
     public class DrawingPriorityAttribute : Attribute
     {
         /// <summary>
-        /// Lower goes first.
+        /// Creates a new instance of <see cref="DrawingPriorityAttribute"/>.
         /// </summary>
-        public int Priority { get; private set; }
-
+        /// <param name="priority">The drawing priority. Lower goes first.</param>
         public DrawingPriorityAttribute(int priority)
         {
             Priority = priority;
         }
+
+        /// <summary>
+        /// Lower goes first.
+        /// </summary>
+        public int Priority { get; private set; }
     }
 }

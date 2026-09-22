@@ -1,4 +1,4 @@
-using UnityEngine.Events;
+using System;
 
 namespace VRBuilder.Core.Properties
 {
@@ -10,7 +10,7 @@ namespace VRBuilder.Core.Properties
         /// <summary>
         /// Raised when the stored value is reset to the default.
         /// </summary>
-        UnityEvent OnValueReset { get; }
+        event Action ValueReset;
 
         /// <summary>
         /// Resets the value to its default.

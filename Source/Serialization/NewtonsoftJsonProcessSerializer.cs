@@ -2,13 +2,14 @@
 // Licensed under the Apache License, Version 2.0
 // Modifications copyright (c) 2021-2026 MindPort GmbH
 
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
 using VRBuilder.Core.IO;
 using VRBuilder.Core.UI.Drawers.Metadata;
 using VRBuilder.Core.Utils;
@@ -18,32 +19,19 @@ namespace VRBuilder.Core.Serialization.NewtonsoftJson
     /// <summary>
     /// This serializer uses NewtonsoftJson to serialize data, the outcome is a json file in the UTF-8 encoding.
     /// </summary>
-    public class NewtonsoftJsonProcessSerializer : IProcessSerializer
+    /// <remarks>
+    /// Partial is important to implement engine-based extensions and code generation.
+    /// </remarks>
+    public partial class NewtonsoftJsonProcessSerializer : IProcessSerializer
     {
-        protected virtual int Version { get; } = 1;
         private static readonly List<JsonConverter> CachedJsonConverters = CreateJsonConverters();
         private static readonly JsonSerializerSettings CachedProcessSerializerSettings = CreateSettings(CachedJsonConverters);
         private static readonly JsonSerializerSettings CachedStepSerializerSettings = CreateStepSerializerSettings();
 
-        private static JsonSerializerSettings CreateSettings(IList<JsonConverter> converters)
-        {
-            return new JsonSerializerSettings
-            {
-                Converters = converters,
-                PreserveReferencesHandling = PreserveReferencesHandling.All,
-                Formatting = Formatting.Indented,
-                ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor,
-                SerializationBinder = new ProcessSerializationBinder(),
-                TypeNameHandling = TypeNameHandling.All
-            };
-        }
-
-        private static JsonSerializerSettings CreateStepSerializerSettings()
-        {
-            List<JsonConverter> converters = new List<JsonConverter> { new IndividualStepTransitionConverter() };
-            converters.AddRange(CachedJsonConverters);
-            return CreateSettings(converters);
-        }
+        /// <summary>
+        /// The version of the serializer format.
+        /// </summary>
+        protected virtual int Version { get; } = 1;
 
         /// <summary>
         /// Returns the json serializer settings used by the process deserialization.
@@ -58,38 +46,11 @@ namespace VRBuilder.Core.Serialization.NewtonsoftJson
             get { return CachedStepSerializerSettings; }
         }
 
-        /// <summary>
-        /// Creates a list of JsonConverters via reflection. It adds all JsonConverters with the <seealso cref="NewtonsoftConverterAttribute"/>
-        /// will be added by default.
-        /// </summary>
-        /// <returns>A list of all found JsonConverters.</returns>
-        private static List<JsonConverter> CreateJsonConverters()
-        {
-            return ReflectionUtils.GetConcreteImplementationsOf<JsonConverter>()
-                .WhichHaveAttribute<NewtonsoftConverterAttribute>()
-                .OrderBy(type => type.GetAttribute<NewtonsoftConverterAttribute>().Priority)
-                .Select(type => ReflectionUtils.CreateInstanceOfType(type) as JsonConverter)
-                .ToList();
-        }
-
         /// <inheritdoc/>
         public virtual string Name { get; } = "Newtonsoft Json Importer";
 
         /// <inheritdoc/>
         public virtual string FileFormat { get; } = "json";
-
-        protected byte[] Serialize(IEntity entity, JsonSerializerSettings settings)
-        {
-            JObject jObject = JObject.FromObject(entity, JsonSerializer.Create(settings));
-            jObject.Add("$serializerVersion", Version);
-            return new UTF8Encoding().GetBytes(jObject.ToString());
-        }
-
-        protected T Deserialize<T>(byte[] data, JsonSerializerSettings settings)
-        {
-            string stringData = new UTF8Encoding().GetString(data);
-            return (T)JsonConvert.DeserializeObject(stringData, settings);
-        }
 
         /// <inheritdoc/>
         public virtual byte[] ProcessToByteArray(IProcess process)
@@ -162,17 +123,102 @@ namespace VRBuilder.Core.Serialization.NewtonsoftJson
             return Deserialize<IEntity>(data, ProcessSerializerSettings);
         }
 
-        internal class ProcessSerializationBinder : DefaultSerializationBinder
+        private static JsonSerializerSettings CreateSettings(IList<JsonConverter> converters)
         {
-            public override Type BindToType(string assemblyName, string typeName)
+            return new JsonSerializerSettings
+            {
+                Converters = converters,
+                PreserveReferencesHandling = PreserveReferencesHandling.All,
+                Formatting = Formatting.Indented,
+                ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor,
+                SerializationBinder = new ProcessSerializationBinder(),
+                TypeNameHandling = TypeNameHandling.All
+            };
+        }
+
+        private static JsonSerializerSettings CreateStepSerializerSettings()
+        {
+            List<JsonConverter> converters = new List<JsonConverter> { new IndividualStepTransitionConverter() };
+            converters.AddRange(CachedJsonConverters);
+            return CreateSettings(converters);
+        }
+
+        /// <summary>
+        /// Creates a list of JsonConverters via reflection. It adds all JsonConverters with the <seealso cref="NewtonsoftConverterAttribute"/>
+        /// will be added by default.
+        /// </summary>
+        /// <returns>A list of all found JsonConverters.</returns>
+        private static List<JsonConverter> CreateJsonConverters()
+        {
+            return ReflectionUtils.GetConcreteImplementationsOf<JsonConverter>()
+                .WhichHaveAttribute<NewtonsoftConverterAttribute>()
+                .OrderBy(type => type.GetAttribute<NewtonsoftConverterAttribute>().Priority)
+                .Select(type => ReflectionUtils.CreateInstanceOfType(type) as JsonConverter)
+                .ToList();
+        }
+
+        /// <summary>
+        /// Serializes the entity to a byte array using the given settings.
+        /// </summary>
+        /// <param name="entity">The entity to serialize.</param>
+        /// <param name="settings">The serializer settings to use.</param>
+        /// <returns>The serialized entity as a UTF-8 byte array.</returns>
+        protected byte[] Serialize(IEntity entity, JsonSerializerSettings settings)
+        {
+            JObject jObject = JObject.FromObject(entity, JsonSerializer.Create(settings));
+            jObject.Add("$serializerVersion", Version);
+            return new UTF8Encoding().GetBytes(jObject.ToString());
+        }
+
+        /// <summary>
+        /// Deserializes the given byte array to an object of type <typeparamref name="T"/> using the given settings.
+        /// </summary>
+        /// <typeparam name="T">The type to deserialize to.</typeparam>
+        /// <param name="data">The serialized data.</param>
+        /// <param name="settings">The serializer settings to use.</param>
+        /// <returns>The deserialized object.</returns>
+        protected T? Deserialize<T>(byte[] data, JsonSerializerSettings settings)
+        {
+            return JsonConvert.DeserializeObject<T>(new UTF8Encoding().GetString(data), settings);
+        }
+
+        internal partial class ProcessSerializationBinder : DefaultSerializationBinder
+        {
+            public override Type BindToType(string? assemblyName, string typeName)
             {
                 if (typeName == "VRBuilder.Core.Editor.UI.Drawers.Metadata.ReorderableElementMetadata")
                 {
                     return typeof(ReorderableElementMetadata);
                 }
 
+                // Assembly-qualified type names embed the Unity assembly name "VRBuilder.Core".
+                // Rewrite it to the assembly this binder runs in, so process files saved in Unity
+                // load in this engine. This applies to the outer assembly name and to generic
+                // arguments in both positions ("..., VRBuilder.Core]]" for the last argument and
+                // "..., VRBuilder.Core]," for inner arguments), and must run BEFORE the fast path
+                // below, which would otherwise hand an unresolvable generic name to Type.GetType.
+                var localAssembly = GetType().Assembly.GetName().Name;
+                if (assemblyName == "VRBuilder.Core")
+                {
+                    assemblyName = localAssembly;
+                }
+
+                typeName = VrBuilderCoreRegex().Replace(typeName, $", {localAssembly}");
+
+                if (typeName.StartsWith("VRBuilder") || typeName.StartsWith("TinkerFlow"))
+                {
+                    var type = Type.GetType(typeName);
+                    if (type != null)
+                        return type;
+                    // Fall through to the default binder, which reports a clearer error for
+                    // generics whose arguments cannot be resolved.
+                }
+
                 return base.BindToType(assemblyName, typeName);
             }
+
+            [GeneratedRegex(@", VRBuilder\.Core(?=\])")]
+            private static partial Regex VrBuilderCoreRegex();
         }
     }
 }

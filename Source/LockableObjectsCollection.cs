@@ -5,7 +5,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using VRBuilder.Core.Properties;
 using VRBuilder.Core.RestrictiveEnvironment;
 using VRBuilder.Core.SceneObjects;
@@ -19,17 +18,13 @@ namespace VRBuilder.Core
     /// </summary>
     public class LockableObjectsCollection
     {
+        private Step.EntityData data;
         private List<LockablePropertyData> toUnlock;
 
         /// <summary>
-        /// Returns the current tags to manually unlock.
+        /// Creates a collection of lockable scene objects for the given step data.
         /// </summary>
-        public IEnumerable<Guid> TagsToUnlock => data.GroupsToUnlock.Keys;
-
-        private Step.EntityData data;
-
-        public List<ISceneObject> SceneObjects { get; set; } = new List<ISceneObject>();
-
+        /// <param name="entityData">The step data whose lock configuration is used to build the collection.</param>
         public LockableObjectsCollection(Step.EntityData entityData)
         {
             toUnlock = PropertyReflectionHelper.ExtractLockablePropertiesFromStep(entityData).ToList();
@@ -38,6 +33,16 @@ namespace VRBuilder.Core
             CreateSceneObjects();
         }
 
+        /// <summary>
+        /// Returns the current tags to manually unlock.
+        /// </summary>
+        public IEnumerable<Guid> TagsToUnlock => data.GroupsToUnlock.Keys;
+
+        /// <summary>
+        /// All scene objects currently managed by this collection.
+        /// </summary>
+        public List<ISceneObject> SceneObjects { get; set; } = new List<ISceneObject>();
+
         private void CreateSceneObjects()
         {
             CleanProperties();
@@ -45,8 +50,8 @@ namespace VRBuilder.Core
             if (data.ToUnlock.Any(propertyReference => propertyReference.TargetObject.Value == null))
             {
                 data.ToUnlock = data.ToUnlock.Where(propertyReference => propertyReference.TargetObject.Value != null).ToList();
-                Debug.LogWarning($"Null references have been found and removed in the manually unlocked objects of step '{data.Name}'.\n" +
-                    $"Did you delete or reset any Process Scene Objects?");
+                ForwardingLogger.LogWarning($"Null references have been found and removed in the manually unlocked objects of step '{data.Name}'.\n" +
+                                            $"Did you delete or reset any Process Scene Objects?");
             }
 
             foreach (LockablePropertyReference propertyReference in data.ToUnlock)
@@ -60,6 +65,10 @@ namespace VRBuilder.Core
             }
         }
 
+        /// <summary>
+        /// Adds the scene object to the collection if it is not already present.
+        /// </summary>
+        /// <param name="sceneObject">The scene object to add.</param>
         public void AddSceneObject(ISceneObject sceneObject)
         {
             if (SceneObjects.Contains(sceneObject) == false)
@@ -71,9 +80,13 @@ namespace VRBuilder.Core
 
         private void SortSceneObjectList()
         {
-            SceneObjects.Sort((obj1, obj2) => obj1.GameObject.ToString().CompareTo(obj2.GameObject.ToString()));
+            SceneObjects.Sort((obj1, obj2) => string.Compare(obj1.ToString(), obj2.ToString(), StringComparison.Ordinal));
         }
 
+        /// <summary>
+        /// Removes the scene object from the collection and removes its references from the manual unlock list.
+        /// </summary>
+        /// <param name="sceneObject">The scene object to remove.</param>
         public void RemoveSceneObject(ISceneObject sceneObject)
         {
             if (SceneObjects.Remove(sceneObject))
@@ -90,7 +103,12 @@ namespace VRBuilder.Core
             }
         }
 
-        public bool IsInManualUnlockList(LockableProperty property)
+        /// <summary>
+        /// Returns true if the given property is in the manual unlock list.
+        /// </summary>
+        /// <param name="property">The property to check.</param>
+        /// <returns><c>true</c> if the property is manually unlocked, otherwise <c>false</c>.</returns>
+        public bool IsInManualUnlockList(ILockableProperty property)
         {
             foreach (LockablePropertyReference lockableProperty in data.ToUnlock)
             {
@@ -103,12 +121,22 @@ namespace VRBuilder.Core
             return false;
         }
 
+        /// <summary>
+        /// Returns true if any property of the scene object is automatically unlocked.
+        /// </summary>
+        /// <param name="sceneObject">The scene object to check.</param>
+        /// <returns><c>true</c> if the object is automatically unlocked, otherwise <c>false</c>.</returns>
         public bool IsUsedInAutoUnlock(ISceneObject sceneObject)
         {
             return toUnlock.Any(propertyData => propertyData.Property.SceneObject == sceneObject);
         }
 
-        public bool IsInAutoUnlockList(LockableProperty property)
+        /// <summary>
+        /// Returns true if the given property is in the automatic unlock list.
+        /// </summary>
+        /// <param name="property">The property to check.</param>
+        /// <returns><c>true</c> if the property is automatically unlocked, otherwise <c>false</c>.</returns>
+        public bool IsInAutoUnlockList(ILockableProperty property)
         {
             foreach (LockablePropertyData lockableProperty in toUnlock)
             {
@@ -121,16 +149,28 @@ namespace VRBuilder.Core
             return false;
         }
 
-        public void Remove(LockableProperty property)
+        /// <summary>
+        /// Removes the property from the manual unlock list.
+        /// </summary>
+        /// <param name="property">The property to remove.</param>
+        public void Remove(ILockableProperty property)
         {
             data.ToUnlock = data.ToUnlock.Where(reference => reference.GetProperty() != property).ToList();
         }
 
-        public void Add(LockableProperty property)
+        /// <summary>
+        /// Adds the property to the manual unlock list.
+        /// </summary>
+        /// <param name="property">The property to add.</param>
+        public void Add(ILockableProperty property)
         {
             data.ToUnlock = data.ToUnlock.Union(new[] { new LockablePropertyReference(property), }).ToList();
         }
 
+        /// <summary>
+        /// Adds a group for the given tag to the groups to unlock.
+        /// </summary>
+        /// <param name="tag">The tag identifying the group.</param>
         public void AddGroup(Guid tag)
         {
             if (data.GroupsToUnlock.ContainsKey(tag))
@@ -141,11 +181,20 @@ namespace VRBuilder.Core
             data.GroupsToUnlock.Add(tag, new List<Type>());
         }
 
+        /// <summary>
+        /// Removes the group for the given tag from the groups to unlock.
+        /// </summary>
+        /// <param name="tag">The tag identifying the group.</param>
         public void RemoveGroup(Guid tag)
         {
             data.GroupsToUnlock.Remove(tag);
         }
 
+        /// <summary>
+        /// Adds the property type to the group identified by the given tag.
+        /// </summary>
+        /// <param name="tag">The tag identifying the group.</param>
+        /// <param name="property">The property type to add.</param>
         public void AddPropertyToGroup(Guid tag, Type property)
         {
             if (data.GroupsToUnlock.ContainsKey(tag) == false)
@@ -156,6 +205,11 @@ namespace VRBuilder.Core
             data.GroupsToUnlock[tag] = data.GroupsToUnlock[tag].Union(new[] { property }).ToList();
         }
 
+        /// <summary>
+        /// Removes the property type from the group identified by the given tag.
+        /// </summary>
+        /// <param name="tag">The tag identifying the group.</param>
+        /// <param name="property">The property type to remove.</param>
         public void RemovePropertyFromGroup(Guid tag, Type property)
         {
             if (data.GroupsToUnlock.ContainsKey(tag) == false)
@@ -166,6 +220,12 @@ namespace VRBuilder.Core
             data.GroupsToUnlock[tag] = data.GroupsToUnlock[tag].Where(p => p != property).ToList();
         }
 
+        /// <summary>
+        /// Returns true if the property type is enabled for the group identified by the given tag.
+        /// </summary>
+        /// <param name="tag">The tag identifying the group.</param>
+        /// <param name="property">The property type to check.</param>
+        /// <returns><c>true</c> if the property is enabled for the group, otherwise <c>false</c>.</returns>
         public bool IsPropertyEnabledForGroup(Guid tag, Type property)
         {
             return data.GroupsToUnlock.ContainsKey(tag) && data.GroupsToUnlock[tag].Contains(property);

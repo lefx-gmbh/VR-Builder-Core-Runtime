@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using VRBuilder.Core.Configuration;
+using VRBuilder.Core.Runtime.Registry;
 
 namespace VRBuilder.Core.SceneObjects
 {
@@ -12,10 +13,33 @@ namespace VRBuilder.Core.SceneObjects
     [DataContract(IsReference = true)]
     public class SingleSceneObjectReference : SingleSceneReference<ISceneObject>
     {
-        /// <inheritdoc/>
-        protected override ISceneObject DetermineValue(ISceneObject cached)
+        /// <summary>
+        /// Initializes a new instance of <see cref="SingleSceneObjectReference"/> referencing no objects.
+        /// </summary>
+        public SingleSceneObjectReference() : base()
         {
-            if (RuntimeConfigurator.Exists == false || IsEmpty())
+        }
+
+        /// <summary>
+        /// Initializes a new instance of <see cref="SingleSceneObjectReference"/> referencing the object with the given guid.
+        /// </summary>
+        /// <param name="guid">The guid of the object this reference should point to.</param>
+        public SingleSceneObjectReference(Guid guid) : base(guid)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of <see cref="SingleSceneObjectReference"/> with the given set of guids.
+        /// </summary>
+        /// <param name="guids">The guids this reference should point to.</param>
+        public SingleSceneObjectReference(IEnumerable<Guid> guids) : base(guids)
+        {
+        }
+
+        /// <inheritdoc/>
+        protected override ISceneObject? DetermineValue(ISceneObject? cached)
+        {
+            if (!ServiceRegistry.Has<IRuntimeService>() || IsEmpty())
             {
                 return null;
             }
@@ -38,7 +62,7 @@ namespace VRBuilder.Core.SceneObjects
 
             foreach (Guid guid in Guids)
             {
-                sceneObjects = sceneObjects.Concat(RuntimeConfigurator.Configuration.SceneObjectRegistry.GetObjects(guid)).Distinct();
+                sceneObjects = sceneObjects.Concat(ServiceRegistry.Get<ISceneObjectRegistry>().GetObjects(guid)).Distinct();
             }
 
             if (sceneObjects.Count() > 0)
@@ -48,9 +72,5 @@ namespace VRBuilder.Core.SceneObjects
 
             return value;
         }
-
-        public SingleSceneObjectReference() : base() { }
-        public SingleSceneObjectReference(Guid guid) : base(guid) { }
-        public SingleSceneObjectReference(IEnumerable<Guid> guids) : base(guids) { }
     }
 }

@@ -1,6 +1,8 @@
 // Copyright (c) 2013-2019 Innoactive GmbH
 // Licensed under the Apache License, Version 2.0
 // Modifications copyright (c) 2021-2026 MindPort GmbH
+// Copyright (c) 2026 Aron Schaub
+// SPDX-License-Identifier: Apache-2.0
 
 using System;
 
@@ -15,7 +17,7 @@ namespace VRBuilder.Core.Configuration.Modes
         /// <inheritdoc />
         protected override bool IsQualifiedByPredicate(Type type)
         {
-            return StoredTypes.Contains(type) == false;
+            return !StoredTypes.Contains(type);
         }
     }
 }

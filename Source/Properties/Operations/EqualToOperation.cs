@@ -13,6 +13,12 @@ namespace VRBuilder.Core.Properties.Operations
             return leftOperand != null && leftOperand.Equals(rightOperand);
         }
 
+        /// <summary>
+        /// Returns the operator symbol.
+        /// </summary>
+        /// <param name="format">The format string.</param>
+        /// <param name="formatProvider">The format provider.</param>
+        /// <returns>The operator symbol.</returns>
         public string ToString(string format, IFormatProvider formatProvider)
         {
             return "==";
@@ -23,9 +29,9 @@ namespace VRBuilder.Core.Properties.Operations
         /// </summary>
         private class AOTHelper
         {
+            EqualToOperation<bool> bln = new EqualToOperation<bool>();
             EqualToOperation<float> flt = new EqualToOperation<float>();
             EqualToOperation<string> str = new EqualToOperation<string>();
-            EqualToOperation<bool> bln = new EqualToOperation<bool>();
         }
     }
 }

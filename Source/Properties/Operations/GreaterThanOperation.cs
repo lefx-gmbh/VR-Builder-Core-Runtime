@@ -13,6 +13,12 @@ namespace VRBuilder.Core.Properties.Operations
             return leftOperand != null && leftOperand.CompareTo(rightOperand) > 0;
         }
 
+        /// <summary>
+        /// Returns the operator symbol.
+        /// </summary>
+        /// <param name="format">The format string.</param>
+        /// <param name="formatProvider">The format provider.</param>
+        /// <returns>The operator symbol.</returns>
         public string ToString(string format, IFormatProvider formatProvider)
         {
             return ">";
@@ -23,9 +29,9 @@ namespace VRBuilder.Core.Properties.Operations
         /// </summary>
         private class AOTHelper
         {
+            GreaterThanOperation<bool> bln = new GreaterThanOperation<bool>();
             GreaterThanOperation<float> flt = new GreaterThanOperation<float>();
             GreaterThanOperation<string> str = new GreaterThanOperation<string>();
-            GreaterThanOperation<bool> bln = new GreaterThanOperation<bool>();
         }
     }
 }

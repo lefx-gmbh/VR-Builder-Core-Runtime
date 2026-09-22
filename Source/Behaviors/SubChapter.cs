@@ -1,5 +1,5 @@
-using Newtonsoft.Json;
 using System.Runtime.Serialization;
+using Newtonsoft.Json;
 
 namespace VRBuilder.Core.Behaviors
 {
@@ -9,6 +9,26 @@ namespace VRBuilder.Core.Behaviors
     [DataContract(IsReference = true)]
     public class SubChapter
     {
+        /// <summary>
+        /// Creates a required (non-optional) sub-chapter.
+        /// </summary>
+        /// <param name="chapter">The chapter to execute.</param>
+        public SubChapter(IChapter chapter) : this(chapter, false)
+        {
+        }
+
+        /// <summary>
+        /// Creates a sub-chapter with the given optionality, used by the JSON deserializer.
+        /// </summary>
+        /// <param name="chapter">The chapter to execute.</param>
+        /// <param name="isOptional">If <c>true</c>, the chapter can be skipped by the user or the process.</param>
+        [JsonConstructor]
+        public SubChapter(IChapter chapter, bool isOptional)
+        {
+            Chapter = chapter;
+            IsOptional = isOptional;
+        }
+
         /// <summary>
         /// The chapter to execute.
         /// </summary>
@@ -20,16 +40,5 @@ namespace VRBuilder.Core.Behaviors
         /// </summary>
         [DataMember]
         public bool IsOptional { get; set; }
-
-        public SubChapter(IChapter chapter) : this(chapter, false)
-        {
-        }
-
-        [JsonConstructor]
-        public SubChapter(IChapter chapter, bool isOptional)
-        {
-            Chapter = chapter;
-            IsOptional = isOptional;
-        }
     }
 }

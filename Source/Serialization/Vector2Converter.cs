@@ -5,12 +5,13 @@
 using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using UnityEngine;
+using VRBuilder.Core.Primitives;
+using VRBuilder.Core.Properties;
 
 namespace VRBuilder.Core.Serialization
 {
     /// <summary>
-    /// Converts Vector2 into json and back.
+    /// Converts <see cref="IVector2"/> implementations (typically <see cref="Vector2Data"/>) to JSON and back.
     /// </summary>
     [NewtonsoftConverter]
     internal class Vector2Converter : JsonConverter
@@ -18,13 +19,24 @@ namespace VRBuilder.Core.Serialization
         /// <inheritDoc/>
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            Vector2 vec = (Vector2) value;
-            JObject data = new JObject();
-
-            data.Add("x", vec.x);
-            data.Add("y", vec.y);
-
-            data.WriteTo(writer);
+            switch (value)
+            {
+                case null:
+                    writer.WriteNull();
+                    return;
+                case IVector2 vec:
+                {
+                    new JObject
+                    {
+                        { "x", vec.X },
+                        { "y", vec.Y }
+                    }.WriteTo(writer);
+                    break;
+                }
+                default:
+                    ForwardingLogger.LogWarning(new JsonSerializationException($"Expected {nameof(IVector2)} but received {value.GetType().FullName}."));
+                    break;
+            }
         }
 
         /// <inheritDoc/>
@@ -32,17 +44,28 @@ namespace VRBuilder.Core.Serialization
         {
             if (reader.TokenType == JsonToken.StartObject)
             {
-                JObject data = (JObject)JToken.ReadFrom(reader);
-                return new Vector2(data["x"].Value<float>(), data["y"].Value<float>());
+                try
+                {
+                    var data = JObject.Load(reader);
+
+                    var x = data["x"]?.Value<float>() ?? 0;
+                    var y = data["y"]?.Value<float>() ?? 0;
+
+                    return new Vector2Data(x, y);
+                }
+                catch (Exception ex)
+                {
+                    ForwardingLogger.LogWarning(new JsonSerializationException($"Failed to deserialize {nameof(Vector2Data)} from JSON {SerializationLoggingHelper.FormatJsonLocation(ex)}.", ex));
+                }
             }
 
-            return Vector2.zero;
+            return new Vector2Data(0, 0);
         }
 
         /// <inheritDoc/>
         public override bool CanConvert(Type objectType)
         {
-            return typeof(Vector2) == objectType;
+            return typeof(IVector2).IsAssignableFrom(objectType);
         }
     }
 }

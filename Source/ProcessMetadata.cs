@@ -10,6 +10,13 @@ namespace VRBuilder.Core
     public class ProcessMetadata : IMetadata
     {
         /// <summary>
+        /// Creates empty process metadata.
+        /// </summary>
+        public ProcessMetadata()
+        {
+        }
+
+        /// <summary>
         /// String localization table for this process.
         /// </summary>
         [DataMember]
@@ -20,9 +27,5 @@ namespace VRBuilder.Core
         /// </summary>
         [DataMember]
         public Guid Guid { get; set; }
-
-        public ProcessMetadata()
-        {
-        }
     }
 }

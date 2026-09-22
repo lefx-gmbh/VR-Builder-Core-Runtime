@@ -21,49 +21,33 @@ namespace VRBuilder.Core
     public class Process : Entity<Process.EntityData>, IProcess
     {
         /// <summary>
-        /// The data class for a process.
+        /// Creates an empty process with no chapters.
         /// </summary>
-        public class EntityData : EntityCollectionData<IChapter>, IProcessData
+        protected Process() : this(null, Array.Empty<IChapter>())
         {
-            /// <inheritdoc />
-            [DataMember]
-            public IList<IChapter> Chapters { get; set; }
+        }
 
-            /// <inheritdoc />
-            public IChapter FirstChapter
-            {
-                get { return Chapters.FirstOrDefault(); }
-            }
+        /// <summary>
+        /// Creates a process with the given name and a single chapter.
+        /// </summary>
+        /// <param name="name">The name of the process.</param>
+        /// <param name="chapter">The initial chapter of the process.</param>
+        public Process(string name, IChapter chapter) : this(name, new List<IChapter> { chapter })
+        {
+        }
 
-            /// <inheritdoc />
-            public override IEnumerable<IChapter> GetChildren()
-            {
-                return Chapters.ToArray();
-            }
+        /// <summary>
+        /// Creates a process with the given name and chapters.
+        /// </summary>
+        /// <param name="name">The name of the process.</param>
+        /// <param name="chapters">The chapters of the process.</param>
+        public Process(string name, IEnumerable<IChapter> chapters)
+        {
+            ProcessMetadata = new ProcessMetadata();
+            ProcessMetadata.Guid = Id;
 
-            /// <inheritdoc />
-            public void SetName(string name)
-            {
-                Name = name;
-            }
-
-            /// <inheritdoc />
-            [IgnoreDataMember]
-            public IChapter Current { get; set; }
-
-            [IgnoreDataMember]
-            public IChapter OverrideNext { get; set; }
-
-            /// <inheritdoc />
-            [DataMember]
-            [HideInProcessInspector]
-            public string Name { get; set; }
-
-            /// <inheritdoc />
-            public IMode Mode { get; set; }
-
-            /// <inheritdoc />
-            IEntity IEntitySequenceData.Current => Current;
+            Data.Chapters = chapters.ToList();
+            Data.Name = name;
         }
 
         /// <summary>
@@ -84,79 +68,6 @@ namespace VRBuilder.Core
             if (ProcessMetadata != null)
             {
                 ProcessMetadata.Guid = Id;
-            }
-        }
-
-        private class ActivatingProcess : EntityIteratingProcess<IEntityNonLinearSequenceDataWithMode<IChapter>, IChapter>
-        {
-            private IEntity[] chapters;
-            private int currentChapterIndex = 0;
-
-            public ActivatingProcess(IEntityNonLinearSequenceDataWithMode<IChapter> data) : base(data)
-            {
-            }
-
-            /// <inheritdoc />
-            public override void Start()
-            {
-                base.Start();
-                chapters = RuntimeEntityGraph.GetChildren(Data);
-            }
-
-            /// <inheritdoc />
-            protected override bool ShouldActivateCurrent()
-            {
-                return true;
-            }
-
-            /// <inheritdoc />
-            protected override bool ShouldDeactivateCurrent()
-            {
-                return true;
-            }
-
-            /// <inheritdoc />
-            protected override bool TryNext(out IChapter entity)
-            {
-                if (Data.OverrideNext != null)
-                {
-                    int overrideIndex = IndexOf(Data.OverrideNext);
-                    if (overrideIndex >= 0)
-                    {
-                        currentChapterIndex = overrideIndex;
-                        Data.OverrideNext = null;
-                    }
-                }
-
-                if (chapters == null || currentChapterIndex >= chapters.Length || currentChapterIndex < 0)
-                {
-                    entity = default;
-                    return false;
-                }
-                else
-                {
-                    entity = (IChapter)chapters[currentChapterIndex];
-                    currentChapterIndex++;
-                    return true;
-                }
-            }
-
-            private int IndexOf(IChapter chapter)
-            {
-                if (chapters == null)
-                {
-                    return -1;
-                }
-
-                for (int i = 0; i < chapters.Length; i++)
-                {
-                    if (Equals(chapters[i], chapter))
-                    {
-                        return i;
-                    }
-                }
-
-                return -1;
             }
         }
 
@@ -184,21 +95,116 @@ namespace VRBuilder.Core
             return new ParallelAbortingProcess<EntityData>(Data);
         }
 
-        protected Process() : this(null, Array.Empty<IChapter>())
+        /// <inheritdoc />
+        
+        /// <summary>
+        /// Creates a new <see cref="IProcess"/>.
+        /// </summary>
+        /// <param name="name"><see cref="IProcess"/>'s name.</param>
+        /// <param name="firstStep">Initial <see cref="IStep"/> for this <see cref="IProcess"/>.</param>
+        public static IProcess Create(string name, IStep firstStep = null)
         {
+            return new Process(name, new Chapter("Chapter 1", firstStep));
         }
 
-        public Process(string name, IChapter chapter) : this(name, new List<IChapter> { chapter })
+        /// <summary>
+        /// The data class for a process.
+        /// </summary>
+        public class EntityData : EntityCollectionData<IChapter>, IProcessData
         {
+            /// <inheritdoc />
+            [DataMember]
+            public IList<IChapter> Chapters { get; set; }
+
+            /// <inheritdoc />
+            public IChapter FirstChapter
+            {
+                get { return Chapters[0]; }
+            }
+
+            /// <inheritdoc />
+            public override IEnumerable<IChapter> GetChildren()
+            {
+                return Chapters.ToArray();
+            }
+
+            /// <inheritdoc />
+            public void SetName(string name)
+            {
+                Name = name;
+            }
+
+            /// <inheritdoc />
+            [IgnoreDataMember]
+            public IChapter Current { get; set; }
+
+            /// <summary>
+            /// The chapter to jump to next, overriding the normal chapter order.
+            /// </summary>
+            [IgnoreDataMember]
+            public IChapter OverrideNext { get; set; }
+
+            /// <inheritdoc />
+            [DataMember]
+            [HideInProcessInspector]
+            public string Name { get; set; }
+
+            /// <inheritdoc />
+            public IMode Mode { get; set; }
+
+            /// <inheritdoc />
+            IEntity IEntitySequenceData.Current => Current;
         }
 
-        public Process(string name, IEnumerable<IChapter> chapters)
+        private class ActivatingProcess : EntityIteratingProcess<IEntityNonLinearSequenceDataWithMode<IChapter>, IChapter>
         {
-            ProcessMetadata = new ProcessMetadata();
-            ProcessMetadata.Guid = Id;
+            private List<IChapter> chapters;
+            private int currentChapterIndex = 0;
 
-            Data.Chapters = chapters.ToList();
-            Data.Name = name;
+            public ActivatingProcess(IEntityNonLinearSequenceDataWithMode<IChapter> data) : base(data)
+            {
+            }
+
+            /// <inheritdoc />
+            public override void Start()
+            {
+                base.Start();
+                chapters = Data.GetChildren().ToList();
+            }
+
+            /// <inheritdoc />
+            protected override bool ShouldActivateCurrent()
+            {
+                return true;
+            }
+
+            /// <inheritdoc />
+            protected override bool ShouldDeactivateCurrent()
+            {
+                return true;
+            }
+
+            /// <inheritdoc />
+            protected override bool TryNext(out IChapter entity)
+            {
+                if (Data.OverrideNext != null && chapters.Contains(Data.OverrideNext))
+                {
+                    currentChapterIndex = chapters.IndexOf(Data.OverrideNext);
+                    Data.OverrideNext = null;
+                }
+
+                if (chapters == null || currentChapterIndex >= chapters.Count() || currentChapterIndex < 0)
+                {
+                    entity = default;
+                    return false;
+                }
+                else
+                {
+                    entity = chapters[currentChapterIndex];
+                    currentChapterIndex++;
+                    return true;
+                }
+            }
         }
 
         [OnDeserialized]
