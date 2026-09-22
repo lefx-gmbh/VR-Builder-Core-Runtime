@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <RootNamespace>VRBuilder.Core</RootNamespace>
+    <AssemblyName>VRBuilder.Core</AssemblyName>
+    <IsAotCompatible>true</IsAotCompatible>
+    <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="bin/**" />
+    <Compile Remove="obj/**" />
+    <!-- Newtonsoft-specific serialization lives in the sibling project (Phase 1). -->
+    <Compile Remove="VRBuilder.Core.Serialization.Newtonsoft/**" />
+    <Compile Remove="VRBuilder.Catalog.Generator/**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="VRBuilder.Catalog.Generator/VRBuilder.Catalog.Generator.csproj"
+                      OutputItemType="Analyzer"
+                      ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+</Project>

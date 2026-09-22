@@ -1,1 +1,5 @@
 *.uid.meta
+
+# .NET build output
+bin/
+obj/
