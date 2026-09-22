@@ -66,6 +66,29 @@ still outstanding:
 | `EntityCloner = new SerializerBackedEntityCloner(Serializer)` | TinkerFlow `RuntimeConfiguration.cs` | **owed** |
 | `EqualityComparer<T>.Default.Equals(value, storedValue)` | TinkerFlow's `DataProperty` | **owed** |
 
+### ⚠️ `ResourcePathHelper` must be added to TinkerFlow-Core, and TinkerFlow is broken until it is
+
+`Source/Utils/ResourcePathHelper.cs` was **removed from core** during the rebase. It was the only
+file in core with `using Godot`, and it used `Godot.ResourceLoader` plus exposed `Godot.AudioStream`
+in a public signature (`LoadAudioStream`) — a hard engine dependency in the engine-agnostic core.
+It had **zero callers in core**; its only consumers are in TinkerFlow-Core:
+
+```
+TinkerFlow/Core/Editor/UI/Drawers/IAudioDataFactory.cs:36   ResourcePathHelper.LoadAudioStream(...)
+TinkerFlow/Core/Editor/UI/Drawers/IAudioDataFactory.cs:60   ResourcePathHelper.NormalizePath(...)
+```
+
+**Removing it from core breaks TinkerFlow-Core's build until the file is added there.** Recover it
+with:
+
+```
+git show 7e5292c:Source/Utils/ResourcePathHelper.cs
+```
+
+Open when porting: which namespace it takes in TinkerFlow (it was `VRBuilder.Core.Utils`), and
+whether the pure path logic (`NormalizePath`, `AudioExtensions`) is worth keeping engine-agnostic
+in core so Unity doesn't need a second copy of the same string handling.
+
 The three source files (`BaseRuntimeConfiguration.cs`, `ProcessRunner.cs`,
 `Properties/DataProperty.cs`) stay deleted in core deliberately — all carry `UnityEngine`
 references and were replaced engine-side. Restoring them would undo the decoupling.
