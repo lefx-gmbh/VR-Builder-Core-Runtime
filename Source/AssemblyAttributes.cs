@@ -7,3 +7,4 @@ using System.Runtime.CompilerServices;
 [assembly: InternalsVisibleTo("VRBuilder.Core.Editor")]
 [assembly: InternalsVisibleTo("VRBuilder.Core.Tests.PlayMode")]
 [assembly: InternalsVisibleTo("VRBuilder.Core.Tests.EditMode")]
+[assembly: InternalsVisibleTo("VRBuilder.Core.Serialization.Newtonsoft")]

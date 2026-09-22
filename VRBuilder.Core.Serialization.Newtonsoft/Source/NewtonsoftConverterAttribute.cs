@@ -4,7 +4,7 @@
 
 using System;
 
-namespace VRBuilder.Core.Serialization
+namespace VRBuilder.Core.Serialization.NewtonsoftJson
 {
     /// <summary>
     /// Every class with this attribute which also extends JsonConverter will be added as converter to the <see cref="VRBuilder.Core.Serialization.NewtonsoftJson.NewtonsoftJsonProcessSerializer"/>.

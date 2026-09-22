@@ -4,7 +4,7 @@ using System;
 using System.Linq;
 using VRBuilder.Core.Primitives;
 
-namespace VRBuilder.Core.Serialization
+namespace VRBuilder.Core.Serialization.NewtonsoftJson
 {
     /// <summary>
     /// Converter that serializes <see cref="IAnimationCurve"/> and deserializes <see cref="AnimationCurveData"/>.

@@ -11,7 +11,7 @@ using Newtonsoft.Json.Linq;
 using VRBuilder.Core.Configuration.Modes;
 using VRBuilder.Core.Serialization.NewtonsoftJson;
 
-namespace VRBuilder.Core.Serialization
+namespace VRBuilder.Core.Serialization.NewtonsoftJson
 {
     /// <summary>
     /// Improved version of the NewtonsoftJsonProcessSerializer, which now allows to serialize very long chapters.

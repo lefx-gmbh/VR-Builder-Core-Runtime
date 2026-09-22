@@ -8,7 +8,7 @@ using Newtonsoft.Json.Linq;
 using VRBuilder.Core.Primitives;
 using VRBuilder.Core.Properties;
 
-namespace VRBuilder.Core.Serialization
+namespace VRBuilder.Core.Serialization.NewtonsoftJson
 {
     /// <summary>
     /// Converts <see cref="IVector2"/> implementations (typically <see cref="Vector2Data"/>) to JSON and back.

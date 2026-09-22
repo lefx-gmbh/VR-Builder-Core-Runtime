@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using VRBuilder.Core.Primitives;
 
-namespace VRBuilder.Core.Serialization
+namespace VRBuilder.Core.Serialization.NewtonsoftJson
 {
     /// <summary>
     /// Converter that serializes <see cref="IKeyframe"/> and deserializes <see cref="KeyframeData"/>.

@@ -6,7 +6,7 @@ using System;
 using Newtonsoft.Json;
 using JsonSerializer = Newtonsoft.Json.JsonSerializer;
 
-namespace VRBuilder.Core.Serialization
+namespace VRBuilder.Core.Serialization.NewtonsoftJson
 {
     /// <summary>
     /// A `JsonConverter` for transitions which serializes the transition's Target as null. It is used to serialize individual steps (for example, for copy/paste feature).

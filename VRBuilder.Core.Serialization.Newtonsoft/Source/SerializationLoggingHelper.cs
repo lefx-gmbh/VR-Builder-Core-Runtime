@@ -1,7 +1,7 @@
 using System;
 using Newtonsoft.Json;
 
-namespace VRBuilder.Core.Serialization
+namespace VRBuilder.Core.Serialization.NewtonsoftJson
 {
     internal static class SerializationLoggingHelper
     {

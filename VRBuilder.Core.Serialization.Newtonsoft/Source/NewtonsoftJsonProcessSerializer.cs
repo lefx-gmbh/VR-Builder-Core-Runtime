@@ -132,7 +132,8 @@ namespace VRBuilder.Core.Serialization.NewtonsoftJson
                 Formatting = Formatting.Indented,
                 ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor,
                 SerializationBinder = new ProcessSerializationBinder(),
-                TypeNameHandling = TypeNameHandling.All
+                TypeNameHandling = TypeNameHandling.All,
+                ContractResolver = new VRBuilderContractResolver()
             };
         }
 
@@ -191,6 +192,21 @@ namespace VRBuilder.Core.Serialization.NewtonsoftJson
                     return typeof(ReorderableElementMetadata);
                 }
 
+                // Try the name exactly as stored first. This engine's core assembly is literally
+                // named "VRBuilder.Core", so most domain types - including inside generic arguments
+                // like "List<IChapter>, mscorlib" - resolve here without any rewriting. Only the
+                // serializer's own wrapper types moved to a different assembly (see below); domain
+                // types did not, and forcing them through that rewrite resolves them against the
+                // wrong assembly.
+                try
+                {
+                    return base.BindToType(assemblyName, typeName);
+                }
+                catch (JsonSerializationException)
+                {
+                    // Fall through to the legacy/cross-engine rewrites below.
+                }
+
                 // Assembly-qualified type names embed the Unity assembly name "VRBuilder.Core".
                 // Rewrite it to the assembly this binder runs in, so process files saved in Unity
                 // load in this engine. This applies to the outer assembly name and to generic
@@ -210,6 +226,20 @@ namespace VRBuilder.Core.Serialization.NewtonsoftJson
                     var type = Type.GetType(typeName);
                     if (type != null)
                         return type;
+
+                    // Files serialized before the Newtonsoft-specific serializer types (this class,
+                    // its V3/V4 subclasses and their nested wrapper types) moved from the flat
+                    // "VRBuilder.Core.Serialization" namespace into "...Serialization.NewtonsoftJson"
+                    // still embed the old flat path, e.g. "...NewtonsoftJsonProcessSerializerV4+ProcessWrapper".
+                    const string legacyPrefix = "VRBuilder.Core.Serialization.";
+                    const string currentPrefix = "VRBuilder.Core.Serialization.NewtonsoftJson.";
+                    if (typeName.StartsWith(legacyPrefix) && !typeName.StartsWith(currentPrefix))
+                    {
+                        type = Type.GetType(currentPrefix + typeName.Substring(legacyPrefix.Length));
+                        if (type != null)
+                            return type;
+                    }
+
                     // Fall through to the default binder, which reports a clearer error for
                     // generics whose arguments cannot be resolved.
                 }

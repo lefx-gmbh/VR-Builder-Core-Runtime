@@ -10,7 +10,7 @@ using Newtonsoft.Json.Linq;
 using VRBuilder.Core.Primitives;
 using VRBuilder.Core.Properties;
 
-namespace VRBuilder.Core.Serialization
+namespace VRBuilder.Core.Serialization.NewtonsoftJson
 {
     /// <summary>
     /// Converts Vector4 into json and back.

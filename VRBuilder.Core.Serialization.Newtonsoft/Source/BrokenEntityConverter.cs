@@ -4,7 +4,7 @@ using Newtonsoft.Json.Linq;
 using VRBuilder.Core.Behaviors;
 using VRBuilder.Core.Conditions;
 
-namespace VRBuilder.Core.Serialization
+namespace VRBuilder.Core.Serialization.NewtonsoftJson
 {
     /// <summary>
     /// Converts behavior and condition JSON, falling back to inspectable placeholders when deserialization fails.

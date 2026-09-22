@@ -14,7 +14,7 @@ using VRBuilder.Core.Configuration.Modes;
 using VRBuilder.Core.EntityOwners;
 using VRBuilder.Core.Serialization.NewtonsoftJson;
 
-namespace VRBuilder.Core.Serialization
+namespace VRBuilder.Core.Serialization.NewtonsoftJson
 {
     /// <summary>
     /// Improved version of the NewtonsoftJsonProcessSerializer, which now flattens nested subchapters.
@@ -119,7 +119,8 @@ namespace VRBuilder.Core.Serialization
                 Formatting = ProcessSerializerSettings.Formatting,
                 ConstructorHandling = ProcessSerializerSettings.ConstructorHandling,
                 SerializationBinder = ProcessSerializerSettings.SerializationBinder,
-                TypeNameHandling = ProcessSerializerSettings.TypeNameHandling
+                TypeNameHandling = ProcessSerializerSettings.TypeNameHandling,
+                ContractResolver = ProcessSerializerSettings.ContractResolver
             };
         }
 
