@@ -1455,7 +1455,6 @@
       },
       "frameworks": {
         "netstandard2.0": {
-          "framework": "netstandard2.0",
           "targetAlias": "netstandard2.0",
           "projectReferences": {}
         }
@@ -1474,7 +1473,6 @@
     },
     "frameworks": {
       "netstandard2.0": {
-        "framework": "netstandard2.0",
         "targetAlias": "netstandard2.0",
         "dependencies": {
           "Microsoft.CodeAnalysis.CSharp": {

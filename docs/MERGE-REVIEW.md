@@ -38,7 +38,20 @@ silently. There is no invalidation path.
 Worth deciding deliberately: either document that editor mutation during play is unsupported, or
 add invalidation.
 
-## 3. `SerializerBackedEntityCloner` is not AOT-compatible
+## 3. `SerializerBackedEntityCloner` is not AOT-compatible — confirmed by the analyzer
+
+**Now measured, not predicted.** After the AOT phases were re-applied, `VRBuilder.Core.csproj`
+builds with **exactly three** trim/AOT diagnostics, and all three are this one file:
+
+```
+Source\Cloning\SerializerBackedEntityCloner.cs(349,45): warning IL2070
+Source\Cloning\SerializerBackedEntityCloner.cs(349,45): warning IL2075
+Source\Cloning\SerializerBackedEntityCloner.cs(351,64): warning SYSLIB0050  (FieldInfo.IsNotSerialized is obsolete)
+```
+
+Every other file in core is trim-clean. Phase 2's "zero trim/AOT warnings" therefore held right up
+until `#19` landed, and this class is the sole regression. Note IL2070/IL2075 are warnings today
+only because `VRBuilder.Core.csproj` does not treat them as errors — the AOT plan intends to.
 
 Two independent reasons, both in `Source/Cloning/SerializerBackedEntityCloner.cs`:
 

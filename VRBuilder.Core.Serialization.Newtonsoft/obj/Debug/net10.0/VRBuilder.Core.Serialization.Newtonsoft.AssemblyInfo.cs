@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("VRBuilder.Core.Serialization.Newtonsoft")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+145f5048e8cdeb8d3cf01bb8aad5fe60ebe64cde")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3f9bee86936744b6f3d7b8e96c0f0899509d5ccf")]
 [assembly: System.Reflection.AssemblyProductAttribute("VRBuilder.Core.Serialization.Newtonsoft")]
 [assembly: System.Reflection.AssemblyTitleAttribute("VRBuilder.Core.Serialization.Newtonsoft")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

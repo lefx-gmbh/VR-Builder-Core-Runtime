@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("VRBuilder.Catalog.Generator")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4fb7f25952f560120f5f48ec8e18a984324d5df4")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3f9bee86936744b6f3d7b8e96c0f0899509d5ccf")]
 [assembly: System.Reflection.AssemblyProductAttribute("VRBuilder.Catalog.Generator")]
 [assembly: System.Reflection.AssemblyTitleAttribute("VRBuilder.Catalog.Generator")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
