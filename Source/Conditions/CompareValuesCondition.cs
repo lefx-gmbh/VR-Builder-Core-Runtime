@@ -1,6 +1,6 @@
 using System;
 using System.Runtime.Serialization;
-using Newtonsoft.Json;
+using VRBuilder.Core.Serialization;
 using VRBuilder.Core.Attributes;
 using VRBuilder.Core.Properties;
 using VRBuilder.Core.Properties.Operations;
@@ -20,7 +20,7 @@ namespace VRBuilder.Core.Conditions
         /// <summary>
         /// Creates a compare-values condition with default operands and an equal-to operation.
         /// </summary>
-        [JsonConstructor]
+        [SerializationConstructor]
         public CompareValuesCondition() : this(Guid.Empty, Guid.Empty, default, default, false, false, new EqualToOperation<T>())
         {
         }

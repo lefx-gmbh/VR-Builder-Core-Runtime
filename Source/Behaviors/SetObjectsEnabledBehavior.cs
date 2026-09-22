@@ -3,7 +3,7 @@
 
 using System;
 using System.Runtime.Serialization;
-using Newtonsoft.Json;
+using VRBuilder.Core.Serialization;
 using VRBuilder.Core.Attributes;
 using VRBuilder.Core.Properties;
 using VRBuilder.Core.SceneObjects;
@@ -20,7 +20,7 @@ namespace VRBuilder.Core.Behaviors
         /// <summary>
         /// Creates a set-objects-enabled behavior with default values.
         /// </summary>
-        [JsonConstructor]
+        [SerializationConstructor]
         public SetObjectsEnabledBehavior() : this(Guid.Empty, false)
         {
         }

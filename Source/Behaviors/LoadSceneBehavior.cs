@@ -5,7 +5,7 @@ using System;
 using System.Collections;
 using System.IO;
 using System.Runtime.Serialization;
-using Newtonsoft.Json;
+using VRBuilder.Core.Serialization;
 using VRBuilder.Core.Attributes;
 using VRBuilder.Core.Properties;
 using VRBuilder.Core.SceneObjects;
@@ -23,7 +23,7 @@ namespace VRBuilder.Core.Behaviors
         /// <summary>
         /// Creates a new <see cref="LoadSceneBehavior"/> without a scene configured.
         /// </summary>
-        [JsonConstructor]
+        [SerializationConstructor]
         public LoadSceneBehavior()
         {
         }

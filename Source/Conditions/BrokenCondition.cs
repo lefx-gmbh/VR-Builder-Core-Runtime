@@ -1,6 +1,6 @@
 using System;
 using System.Runtime.Serialization;
-using Newtonsoft.Json;
+using VRBuilder.Core.Serialization;
 using VRBuilder.Core.Attributes;
 using VRBuilder.Core.Configuration.Modes;
 
@@ -18,7 +18,7 @@ namespace VRBuilder.Core.Conditions
         /// <summary>
         /// Creates an empty placeholder for JSON deserialization.
         /// </summary>
-        [JsonConstructor]
+        [SerializationConstructor]
         internal BrokenCondition()
         {
         }

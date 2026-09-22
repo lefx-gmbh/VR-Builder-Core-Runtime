@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
-using Newtonsoft.Json;
+using VRBuilder.Core.Serialization;
 using VRBuilder.Core.Attributes;
 using VRBuilder.Core.Configuration.Modes;
 using VRBuilder.Core.EntityOwners;
@@ -20,7 +20,7 @@ namespace VRBuilder.Core.Behaviors
         /// <summary>
         /// Creates an empty behavior sequence, used by the JSON deserializer.
         /// </summary>
-        [JsonConstructor]
+        [SerializationConstructor]
         public BehaviorSequence() : this(default(bool), new List<IBehavior>())
         {
         }

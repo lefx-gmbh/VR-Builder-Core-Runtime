@@ -1,5 +1,5 @@
 using System.Runtime.Serialization;
-using Newtonsoft.Json;
+using VRBuilder.Core.Serialization;
 
 namespace VRBuilder.Core.Behaviors
 {
@@ -22,7 +22,7 @@ namespace VRBuilder.Core.Behaviors
         /// </summary>
         /// <param name="chapter">The chapter to execute.</param>
         /// <param name="isOptional">If <c>true</c>, the chapter can be skipped by the user or the process.</param>
-        [JsonConstructor]
+        [SerializationConstructor]
         public SubChapter(IChapter chapter, bool isOptional)
         {
             Chapter = chapter;

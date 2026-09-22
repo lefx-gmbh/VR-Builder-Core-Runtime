@@ -4,7 +4,7 @@
 using System;
 using System.Collections;
 using System.Runtime.Serialization;
-using Newtonsoft.Json;
+using VRBuilder.Core.Serialization;
 using VRBuilder.Core.Attributes;
 using VRBuilder.Core.Properties;
 using VRBuilder.Core.SceneObjects;
@@ -22,7 +22,7 @@ namespace VRBuilder.Core.Behaviors
         /// <summary>
         /// Creates a new <see cref="ResetValueBehavior"/>; the target property must be configured later.
         /// </summary>
-        [JsonConstructor]
+        [SerializationConstructor]
         public ResetValueBehavior() : this(Guid.Empty)
         {
         }

@@ -3,7 +3,7 @@
 
 using System.Diagnostics;
 using System.Runtime.Serialization;
-using Newtonsoft.Json;
+using VRBuilder.Core.Serialization;
 using VRBuilder.Core.Attributes;
 
 namespace VRBuilder.Core.Conditions
@@ -18,7 +18,7 @@ namespace VRBuilder.Core.Conditions
         /// <summary>
         /// Creates an empty timeout condition, used by the JSON deserializer.
         /// </summary>
-        [JsonConstructor]
+        [SerializationConstructor]
         public TimeoutCondition() : this(0)
         {
         }

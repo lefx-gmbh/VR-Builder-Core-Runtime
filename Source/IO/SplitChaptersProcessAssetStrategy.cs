@@ -1,4 +1,3 @@
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -76,7 +75,7 @@ namespace VRBuilder.Core.IO
         [Serializable]
         private class ChapterRef : Entity<Chapter.EntityData>, IChapter
         {
-            [JsonConstructor]
+            [SerializationConstructor]
             public ChapterRef()
             {
             }

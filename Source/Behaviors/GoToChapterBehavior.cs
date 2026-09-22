@@ -4,7 +4,7 @@
 using System;
 using System.Collections;
 using System.Runtime.Serialization;
-using Newtonsoft.Json;
+using VRBuilder.Core.Serialization;
 using VRBuilder.Core.Attributes;
 using VRBuilder.Core.Cloning;
 #if UNITY_6000_0_OR_NEWER
@@ -22,7 +22,7 @@ namespace VRBuilder.Core.Behaviors
         /// <summary>
         /// Creates a new <see cref="GoToChapterBehavior"/> without a target chapter.
         /// </summary>
-        [JsonConstructor]
+        [SerializationConstructor]
         public GoToChapterBehavior() : this(Guid.Empty)
         {
         }

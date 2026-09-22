@@ -4,7 +4,7 @@
 using System;
 using System.Collections;
 using System.Runtime.Serialization;
-using Newtonsoft.Json;
+using VRBuilder.Core.Serialization;
 using VRBuilder.Core.Attributes;
 using VRBuilder.Core.Configuration.Modes;
 using VRBuilder.Core.Properties;
@@ -23,7 +23,7 @@ namespace VRBuilder.Core.Behaviors
         /// <summary>
         /// Creates an empty play audio behavior, used by the JSON deserializer.
         /// </summary>
-        [JsonConstructor]
+        [SerializationConstructor]
         protected PlayAudioBehavior() : this(Guid.Empty, null, BehaviorExecutionStages.None)
         {
         }

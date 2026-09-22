@@ -5,7 +5,7 @@ using System;
 using System.Collections;
 using System.Diagnostics;
 using System.Runtime.Serialization;
-using Newtonsoft.Json;
+using VRBuilder.Core.Serialization;
 using VRBuilder.Core.Attributes;
 using VRBuilder.Core.Properties;
 using VRBuilder.Core.SceneObjects;
@@ -29,7 +29,7 @@ namespace VRBuilder.Core.Behaviors
         /// <summary>
         /// Creates a confetti behavior with default values.
         /// </summary>
-        [JsonConstructor]
+        [SerializationConstructor]
         public ConfettiBehavior() : this(true, Guid.Empty, "", defaultRadius, defaultDuration, BehaviorExecutionStages.Activation)
         {
         }

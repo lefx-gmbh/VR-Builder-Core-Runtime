@@ -3,7 +3,7 @@
 
 using System;
 using System.Runtime.Serialization;
-using Newtonsoft.Json;
+using VRBuilder.Core.Serialization;
 using VRBuilder.Core.Attributes;
 using VRBuilder.Core.Configuration.Modes;
 using VRBuilder.Core.Primitives;
@@ -25,7 +25,7 @@ namespace VRBuilder.Core.Behaviors
         /// <summary>
         /// Creates a new <see cref="HighlightObjectBehavior"/>; the target object must be configured later.
         /// </summary>
-        [JsonConstructor]
+        [SerializationConstructor]
         public HighlightObjectBehavior() : this(Guid.Empty, defaultHighlightColor)
         {
         }
@@ -98,7 +98,7 @@ namespace VRBuilder.Core.Behaviors
             /// Highlight color set in the Step Inspector.
             /// </summary>
             [DataMember(Name = "HighlightColor")]
-            [JsonProperty("HighlightColor")]
+            [SerializedName("HighlightColor")]
             [DisplayName("Color")]
             public IColor Color
             {

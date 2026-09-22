@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.Serialization;
-using Newtonsoft.Json;
+using VRBuilder.Core.Serialization;
 using VRBuilder.Core.Attributes;
 using VRBuilder.Core.Primitives;
 using VRBuilder.Core.Properties;
@@ -25,7 +25,7 @@ namespace VRBuilder.Core.Behaviors
         /// <summary>
         /// Creates a scaling behavior with default values.
         /// </summary>
-        [JsonConstructor]
+        [SerializationConstructor]
         public ScalingBehavior() : this(Array.Empty<ISceneObject>(), Vector3Data.One, 0f)
         {
         }

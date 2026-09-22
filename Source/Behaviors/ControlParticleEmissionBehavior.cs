@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Linq;
 using System.Runtime.Serialization;
-using Newtonsoft.Json;
+using VRBuilder.Core.Serialization;
 using VRBuilder.Core.Attributes;
 using VRBuilder.Core.Properties;
 using VRBuilder.Core.SceneObjects;
@@ -18,7 +18,7 @@ namespace VRBuilder.Core.Behaviors
         /// <summary>
         /// Creates an empty particle emission behavior, used by the JSON deserializer.
         /// </summary>
-        [JsonConstructor]
+        [SerializationConstructor]
         public ControlParticleEmissionBehavior() : this(default)
         {
         }

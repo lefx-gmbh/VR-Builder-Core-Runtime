@@ -4,7 +4,7 @@
 using System.Collections;
 using System.Diagnostics;
 using System.Runtime.Serialization;
-using Newtonsoft.Json;
+using VRBuilder.Core.Serialization;
 using VRBuilder.Core.Attributes;
 
 namespace VRBuilder.Core.Behaviors
@@ -19,7 +19,7 @@ namespace VRBuilder.Core.Behaviors
         /// <summary>
         /// Creates a new <see cref="DelayBehavior"/> with no delay.
         /// </summary>
-        [JsonConstructor]
+        [SerializationConstructor]
         public DelayBehavior() : this(0)
         {
         }

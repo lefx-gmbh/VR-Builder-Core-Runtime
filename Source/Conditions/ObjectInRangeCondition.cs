@@ -3,7 +3,7 @@
 
 using System;
 using System.Runtime.Serialization;
-using Newtonsoft.Json;
+using VRBuilder.Core.Serialization;
 using VRBuilder.Core.Attributes;
 using VRBuilder.Core.Properties;
 using VRBuilder.Core.SceneObjects;
@@ -21,7 +21,7 @@ namespace VRBuilder.Core.Conditions
         /// <summary>
         /// Creates an empty "object in range" condition, used by the JSON deserializer.
         /// </summary>
-        [JsonConstructor]
+        [SerializationConstructor]
         public ObjectInRangeCondition() : this(Guid.Empty, Guid.Empty, 0f)
         {
         }

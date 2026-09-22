@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
-using Newtonsoft.Json;
+using VRBuilder.Core.Serialization;
 using VRBuilder.Core.Attributes;
 using VRBuilder.Core.Properties;
 using VRBuilder.Core.Runtime.Registry;
@@ -24,7 +24,7 @@ namespace VRBuilder.Core.Conditions
         /// <summary>
         /// Creates an empty "object in collider" condition, used by the JSON deserializer.
         /// </summary>
-        [JsonConstructor]
+        [SerializationConstructor]
         public ObjectInColliderCondition() : this(Guid.Empty, Guid.Empty)
         {
         }

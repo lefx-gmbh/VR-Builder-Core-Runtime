@@ -4,7 +4,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
-using Newtonsoft.Json;
+using VRBuilder.Core.Serialization;
 using VRBuilder.Core.Attributes;
 using VRBuilder.Core.EntityOwners;
 using VRBuilder.Core.EntityOwners.ParallelEntityCollection;
@@ -20,7 +20,7 @@ namespace VRBuilder.Core.Behaviors
         /// <summary>
         /// Creates a new <see cref="ExecuteChapterBehavior"/> without a chapter assigned.
         /// </summary>
-        [JsonConstructor]
+        [SerializationConstructor]
         public ExecuteChapterBehavior() : this(null)
         {
         }

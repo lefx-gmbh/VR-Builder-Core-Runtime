@@ -5,7 +5,7 @@ using System;
 using System.Collections;
 using System.Diagnostics;
 using System.Runtime.Serialization;
-using Newtonsoft.Json;
+using VRBuilder.Core.Serialization;
 using VRBuilder.Core.Attributes;
 using VRBuilder.Core.Primitives;
 using VRBuilder.Core.Properties;
@@ -26,7 +26,7 @@ namespace VRBuilder.Core.Behaviors
         /// <summary>
         /// Creates a new <see cref="MoveObjectBehavior"/>; the target and final position must be configured later.
         /// </summary>
-        [JsonConstructor]
+        [SerializationConstructor]
         public MoveObjectBehavior() : this(Guid.Empty, Guid.Empty, 0f)
         {
         }

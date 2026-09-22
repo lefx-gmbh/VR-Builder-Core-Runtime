@@ -4,7 +4,7 @@
 using System;
 using System.Collections;
 using System.Runtime.Serialization;
-using Newtonsoft.Json;
+using VRBuilder.Core.Serialization;
 using VRBuilder.Core.Attributes;
 using VRBuilder.Core.Properties;
 using VRBuilder.Core.SceneObjects;
@@ -22,7 +22,7 @@ namespace VRBuilder.Core.Behaviors
         /// <summary>
         /// Creates a set-parent behavior with empty targets.
         /// </summary>
-        [JsonConstructor]
+        [SerializationConstructor]
         public SetParentBehavior() : this(Guid.Empty, Guid.Empty)
         {
         }
