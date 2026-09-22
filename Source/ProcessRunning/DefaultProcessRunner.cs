@@ -114,6 +114,10 @@ namespace VRBuilder.Core.ProcessRunning
 
             Events.ProcessSetup?.Invoke(this, new ProcessEventArgs(currentProcess));
 
+            // Snapshot the topology only after ProcessSetup handlers have run: they may still
+            // modify it, but child membership and ordering must stay stable from here on.
+            RuntimeEntityGraph.Prepare(currentProcess);
+
             if (ServiceRegistry.Has<ModeService>())
                 ServiceRegistry.Get<ModeService>().ModeHandler.ModeChanged += HandleModeChanged;
 
