@@ -16,6 +16,31 @@ namespace VRBuilder.Core.Cloning
     /// <summary>
     /// Creates independent entity copies by serializing and deserializing their owned graph, then regenerating IDs and remapping internal references.
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Lives in this project rather than in core, deliberately. It is outside the AOT boundary for
+    /// two independent reasons:
+    /// </para>
+    /// <para>
+    /// It clones by round-tripping through an <see cref="IProcessSerializer"/>, and core never
+    /// serializes — there is no serializer available inside the AOT-published core to hand it.
+    /// </para>
+    /// <para>
+    /// It also enumerates private fields reflectively up the base-type chain
+    /// (<c>GetFields(Instance | Public | NonPublic | DeclaredOnly)</c>). Trimming removes fields
+    /// nothing statically references, so under NativeAOT that walk would return an incomplete set
+    /// and produce <em>silently partial clones</em> — wrong data rather than a clean failure. While
+    /// this lived in core it was the only source of trim warnings there (IL2070, IL2075, plus
+    /// SYSLIB0050 for the obsolete <c>FieldInfo.IsNotSerialized</c>); core is trim-clean without it.
+    /// </para>
+    /// <para>
+    /// Cloning is an authoring-time operation — duplicating a step or a chapter — so the runtime
+    /// never needs it. The namespace stays <c>VRBuilder.Core.Cloning</c> to keep it grouped with
+    /// <see cref="IEntityCloner"/> and <see cref="EntityReference{TEntity}"/>, which remain in core;
+    /// only the assembly changed. Nothing here is Newtonsoft-specific — this project is simply the
+    /// JIT/tooling side of the split.
+    /// </para>
+    /// </remarks>
     public sealed class SerializerBackedEntityCloner : IEntityCloner
     {
         private sealed class ReferenceComparer<T> : IEqualityComparer<T> where T : class

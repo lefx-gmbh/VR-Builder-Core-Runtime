@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("VRBuilder.Core")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3f9bee86936744b6f3d7b8e96c0f0899509d5ccf")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1191a4040efe1d6d01c5cca026a6699e72c4890f")]
 [assembly: System.Reflection.AssemblyProductAttribute("VRBuilder.Core")]
 [assembly: System.Reflection.AssemblyTitleAttribute("VRBuilder.Core")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

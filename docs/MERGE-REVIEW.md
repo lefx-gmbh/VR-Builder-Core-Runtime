@@ -38,35 +38,20 @@ silently. There is no invalidation path.
 Worth deciding deliberately: either document that editor mutation during play is unsupported, or
 add invalidation.
 
-## 3. `SerializerBackedEntityCloner` is not AOT-compatible — confirmed by the analyzer
+## 3. `SerializerBackedEntityCloner` moved out of core — RESOLVED
 
-**Now measured, not predicted.** After the AOT phases were re-applied, `VRBuilder.Core.csproj`
-builds with **exactly three** trim/AOT diagnostics, and all three are this one file:
+`Source/Cloning/SerializerBackedEntityCloner.cs` now lives in
+`VRBuilder.Core.Serialization.Newtonsoft/Source/Cloning/`. While it sat in core it was the **only**
+source of trim diagnostics there (IL2070, IL2075, SYSLIB0050), all from its reflective
+private-field walk. Core is trim-clean again, measured.
 
-```
-Source\Cloning\SerializerBackedEntityCloner.cs(349,45): warning IL2070
-Source\Cloning\SerializerBackedEntityCloner.cs(349,45): warning IL2075
-Source\Cloning\SerializerBackedEntityCloner.cs(351,64): warning SYSLIB0050  (FieldInfo.IsNotSerialized is obsolete)
-```
+It was moved rather than fixed because it cannot work inside the AOT boundary regardless: it clones
+by round-tripping through an `IProcessSerializer`, and core never serializes. The reflective walk is
+also unsafe under trimming in a way that produces *silently partial clones* rather than an error.
 
-Every other file in core is trim-clean. Phase 2's "zero trim/AOT warnings" therefore held right up
-until `#19` landed, and this class is the sole regression. Note IL2070/IL2075 are warnings today
-only because `VRBuilder.Core.csproj` does not treat them as errors — the AOT plan intends to.
-
-Two independent reasons, both in `Source/Cloning/SerializerBackedEntityCloner.cs`:
-
-- it clones by **round-tripping through `IProcessSerializer`**, and there is no serializer inside
-  the AOT boundary — core does not serialize
-- it enumerates **private fields reflectively** up the base-type chain
-  (`GetFields(Instance | Public | NonPublic | DeclaredOnly)`). Trimming removes unreferenced
-  fields, so under NativeAOT this returns an incomplete set and produces **silently partial
-  clones** — no exception, just wrong data
-
-The interfaces (`IEntityCloner`, `IEntityCloneContext`) and the identity model (`Entity.Id`,
-`EntityReference<T>`) are fine and AOT-safe; only this implementation is the problem. It depends
-on `IProcessSerializer`, so it arguably belongs on the tooling side next to the Newtonsoft
-serializers rather than in core. Placement was deliberately left as MindPort had it — revisit
-during the AOT pass.
+`IEntityCloner`, `IEntityCloneContext` and `EntityReference<T>` stay in core — they are AOT-safe and
+are the useful half of `#19`. The namespace stayed `VRBuilder.Core.Cloning`; only the assembly
+changed. Nothing in the class is Newtonsoft-specific; that project is simply the JIT/tooling side.
 
 ## 4. Ports still owed into other repos
 
